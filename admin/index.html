@@ -1,0 +1,175 @@
+<html>
+
+<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
+<script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+<script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+<script type="text/javascript" src="../../js/translate.js"></script>
+<script type="text/javascript" src="../../js/adapter-settings.js"></script>
+
+<style>
+    .value {
+        width: 250px;
+    }
+</style>
+<script type="text/javascript">
+    systemDictionary = {
+        "CUL adapter settings":     {
+            "en": "CUL adapter settings",
+            "de": "CUL Adapter Einstellungen",
+            "ru": "Настройки CUL Драйвера"
+        },
+        "Serial port:":     {"en": "Serial port:",      "de": "Serialport:",    "ru": "Порт:"},
+        "Baud rate":        {"en": "Baud rate:",        "de": "Baud rate:",     "ru": "Скорость:"},
+        "Select port":      {"en": "Select port",       "de": "Port auswählen", "ru": "Select port"}
+    };
+
+    var timeout;
+
+    function getComPorts(actualValue) {
+        timeout = setTimeout(function () {
+            getComPorts(actualValue);
+        }, 2000);
+
+        sendTo(null, 'listUart', null, function (list) {
+            if (timeout) {
+                clearTimeout(timeout);
+                timeout = null;
+            }
+            if (!list || !list.length) {
+                setTimeout(function () {
+                    getComPorts(actualValue);
+                }, 1000);
+                return;
+            }
+            var text = '<option value="">' + _('Select port') + '</option>';
+            for (var j = 0; j < list.length; j++) {
+                if (list[j].comName === 'Not available') {
+                    text += '<option value="" selected>' + _('Not available') + '</option>';
+                    $('#serialport').prop('disabled', true);
+                    break;
+                } else {
+                    text += '<option value="' + list[j].comName + '" ' + ((actualValue === list[j].comName) ? 'selected' : '') + '>' + list[j].comName + '</option>';
+                }
+            }
+            $('#serialport').html(text);
+        });
+    }
+
+    // the function loadSettings has to exist ...
+    function load(settings, onChange) {
+        // example: select elements with id=key and class=value and insert value
+        if (!settings.type) settings.type = 'cul';
+
+        for (var key in settings) {
+            if (!settings.hasOwnProperty(key)) continue;
+            var $value = $('#' + key + '.value');
+            // example: select elements with id=key and class=value and insert value
+            if ($value.attr('type') === 'checkbox') {
+                $value.prop('checked', settings[key]).change(function () {
+                    onChange();
+                });
+            } else {
+                $value.val(settings[key]).change(function () {
+                    var id = $(this).attr('id');
+                    if (id === 'type') {
+                        if ($(this).val() === 'cul') {
+                            $('#baudrate').val('9600');
+                        } else {
+                            $('#baudrate').val('38400');
+                        }
+                    }
+                    onChange();
+                }).keyup(onChange);
+            }
+        }
+
+        getIsAdapterAlive(function (isAlive) {
+            if (isAlive || common.enabled) {
+                getComPorts(settings.serialport);
+            } else {
+                $('#_serialport').html('<input id="serialport" class="value" value="' + settings.serialport + '"/>');
+                $('#serialport').change(onChange).keyup(onChange);
+            }
+        });
+
+        // Signal to admin, that no changes yet
+        onChange(false);
+    }
+
+    // ... and the function save has to exist.
+    // you have to make sure the callback is called with the settings object as first param!
+    function save(callback) {
+        // example: select elements with class=value and build settings object
+        var obj = {};
+        $('.value').each(function () {
+            var $this = $(this);
+            if ($this.attr('type') === 'checkbox') {
+                obj[$this.attr('id')] = $this.prop('checked');
+            } else {
+                obj[$this.attr('id')] = $this.val();
+            }
+        });
+        if (obj.homebaseAddress.length !== 6) {
+            window.alert(_('Base address must have 6 HEX Symbols'));
+            return;
+        }
+        obj.homebaseAddress = obj.homebaseAddress.toLowerCase();
+        for (var h = 0; h < obj.homebaseAddress.length; h++) {
+            if (obj.homebaseAddress[h] >= '0' && obj.homebaseAddress[h] <= '9') continue;
+            if (obj.homebaseAddress[h] >= 'a' && obj.homebaseAddress[h] <= 'f') continue;
+            window.alert(_('Base address must have 6 HEX Symbols'));
+            break;
+        }
+        callback(obj);
+    }
+
+</script>
+
+<div id="adapter-container">
+    <table><tr><td><img src="maxcul.png" width="64" height="64"></td><td><h3 class="translate">MAX! CUL adapter settings</h3></td></tr></table>
+
+
+    <!--"serialport": "/dev/ttyACM0",
+    "baudrate":   9600,
+    "mode":       "SlowRF",
+    "parse":      true,
+    "init":       true,
+    "coc":        false,
+    "rssi":       true -->
+
+
+    <table>
+        <tr>
+            <td><label  class="translate" for="serialport">Serial port:</label></td>
+            <td id="_serialport"><select id="serialport" class="value"></select></td>
+        </tr>
+        <tr>
+            <td class="translate">Baud rate</td>
+            <td><select type="text" id="baudrate"   class="value">
+                <option value="110">110</option>
+                <option value="150">150</option>
+                <option value="300">300</option>
+                <option value="600">600</option>
+                <option value="1200">1200</option>
+                <option value="2400">2400</option>
+                <option value="4800">4800</option>
+                <option value="9600">9600</option>
+                <option value="19200">19200</option>
+                <option value="38400">38400</option>
+                <option value="56000">56000</option>
+                <option value="57600">57600</option>
+                <option value="115200">115200</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td><label  class="translate" for="homebaseAddress">Base address:</label></td>
+            <td><input id="homebaseAddress" maxlength="6" class="value" /></td>
+        </tr>
+    </table>
+
+</div>
+
+</html>

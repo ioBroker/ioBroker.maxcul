@@ -1,0 +1,65 @@
+{
+  "author": {
+    "name": "bluefox",
+    "email": "dogafox@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/ioBroker/ioBroker.maxcul/issues"
+  },
+  "contributors": [
+    {
+      "name": "bluefox",
+      "email": "dogafox@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "moment": "^2.18.1",
+    "bluebird": "^3.5.0",
+    "serialport": "^3.0.0",
+    "bitset.js": "^3.1.0",
+    "binary-parser": "^1.1.5",
+    "sprintf-js": "^1.0.3"
+  },
+  "description": "Javascript/Node.js based Busware CUL USB / culfw adapter",
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.11.2",
+    "grunt-http": "^1.6.0",
+    "grunt-jscs": "^2.0.0",
+    "grunt-replace": "^0.9.3",
+    "mocha": "^2.3.4"
+  },
+  "directories": {},
+  "homepage": "https://github.com/ioBroker/ioBroker.maxcul",
+  "keywords": [
+    "ioBroker",
+    "cul stick",
+    "home automation"
+  ],
+  "license": "GPL-2.0",
+  "licenses": [
+    {
+      "type": "GPL-2.0",
+      "url": "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/LICENSE"
+    }
+  ],
+  "main": "main.js",
+  "maintainers": [
+    {
+      "name": "bluefox",
+      "email": "dogafox@gmail.com"
+    }
+  ],
+  "name": "iobroker.maxcul",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ioBroker/ioBroker.maxcul.git"
+  },
+  "scripts": {
+    "test": "node node_modules/mocha/bin/mocha"
+  },
+  "version": "0.1.0"
+}

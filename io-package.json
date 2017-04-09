@@ -1,0 +1,54 @@
+{
+    "common": {
+        "name":                     "maxcul",
+        "version": "0.1.0",
+        "news": {
+            "0.1.0": {
+                "en": "intial commit",
+                "de": "intial commit",
+                "ru": "intial commit"
+            }
+        },
+        "title":                    "max! CUL",
+        "desc":                     "Control max! devices over CUL stick",
+        "platform":                 "javascript/Node.js",
+        "mode":                     "daemon",
+        "loglevel":                 "info",
+        "license":                  "GPL-2.0",
+        "enabled":                  true,
+        "messagebox":               true,
+        "icon":                     "maxcul.png",
+        "extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/admin/maxcul.png",
+        "keywords":                 ["cul", "MAX!", "868", "busware"],
+		"readme":                   "https://github.com/ioBroker/ioBroker.cul/blob/master/README.md",
+		"type":                     "hardware"
+    },
+    "native": {
+        "serialport": "",
+        "baudrate":   34800,
+        "homebaseAddress": "123456"
+    },
+    "instanceObjects": [
+        {
+            "_id":  "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id":  "info.connection",
+            "type": "state",
+            "common": {
+                "role":  "indicator.connected",
+                "name":  "If connected to CUL",
+                "type":  "boolean",
+                "read":  true,
+                "write": false,
+                "def":   false
+            },
+            "native": {}
+        }
+    ]
+}
