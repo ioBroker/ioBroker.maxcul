@@ -793,6 +793,12 @@ function createContact(data) {
 }
 
 function connect() {
+	
+	if (!adapter.config.serialport) {
+        adapter.log.warn('Please define the serial port.');
+        return;
+    }
+	
     var env = {
         logger: adapter.log
     };
