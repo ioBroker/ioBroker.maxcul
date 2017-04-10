@@ -8,11 +8,20 @@ var utils = require(__dirname + '/lib/utils'); // Get common adapter utils
 var max;
 var objects = {};
 var SerialPort;
+var serialport;
 var devices = {};
 var timers = {};
 var limitOverflow = null;
 var credits = 0;
 var connected = false;
+
+try {
+    serialport = require('serialport');
+    SerialPort = serialport.SerialPort;
+} catch (err) {
+    console.error('Cannot load serialport module');
+}
+
 
 var adapter = utils.adapter('maxcul');
 
@@ -53,9 +62,9 @@ adapter.on('message', function (obj) {
         switch (obj.command) {
             case 'listUart':
                 if (obj.callback) {
-                    if (SerialPort) {
+                    if (serialport) {
                         // read all found serial ports
-                        SerialPort.list(function (err, ports) {
+                        serialport.list(function (err, ports) {
                             adapter.log.info('List of port: ' + JSON.stringify(ports));
                             adapter.sendTo(obj.from, obj.command, ports, obj.callback);
                         });

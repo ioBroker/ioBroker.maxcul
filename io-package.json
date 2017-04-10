@@ -1,9 +1,9 @@
 {
     "common": {
         "name":                     "maxcul",
-        "version": "0.1.0",
+        "version": "0.1.1",
         "news": {
-            "0.1.0": {
+            "0.1.1": {
                 "en": "intial commit",
                 "de": "intial commit",
                 "ru": "intial commit"
@@ -25,7 +25,7 @@
     },
     "native": {
         "serialport": "",
-        "baudrate":   34800,
+        "baudrate":   38400,
         "baseAddress": "123456"
     },
     "instanceObjects": [

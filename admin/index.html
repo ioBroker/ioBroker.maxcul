@@ -16,14 +16,16 @@
 </style>
 <script type="text/javascript">
     systemDictionary = {
-        "CUL adapter settings":     {
-            "en": "CUL adapter settings",
-            "de": "CUL Adapter Einstellungen",
-            "ru": "Настройки CUL Драйвера"
+        "MAX! CUL adapter settings":     {
+            "en": "MAX! CUL adapter settings",
+            "de": "MAX! CUL Adapter Einstellungen",
+            "ru": "Настройки MAX! CUL Драйвера"
         },
-        "Serial port:":     {"en": "Serial port:",      "de": "Serialport:",    "ru": "Порт:"},
-        "Baud rate":        {"en": "Baud rate:",        "de": "Baud rate:",     "ru": "Скорость:"},
-        "Select port":      {"en": "Select port",       "de": "Port auswählen", "ru": "Select port"}
+        "Serial port:":     {"en": "Serial port:",      "de": "Serialport:",     "ru": "Порт:"},
+        "Baud rate":        {"en": "Baud rate:",        "de": "Baud rate:",      "ru": "Скорость:"},
+        "Select port":      {"en": "Select port",       "de": "Port auswählen",  "ru": "Select port"},
+        "Base address:":    {"en": "Own base address:", "de": "Eigene Adresse:", "ru": "Собственный адрес:"},
+        "No ports found":   {"en": "No ports found",    "de": "Keine Ports gefunden", "ru": "Портов не найдено"}
     };
 
     var timeout;
@@ -38,13 +40,13 @@
                 clearTimeout(timeout);
                 timeout = null;
             }
-            if (!list || !list.length) {
+            if (!list) {
                 setTimeout(function () {
                     getComPorts(actualValue);
                 }, 1000);
                 return;
             }
-            var text = '<option value="">' + _('Select port') + '</option>';
+            var text = list.length ? '<option value="">' + _('Select port') + '</option>' : '<option value="">' + _('No ports found') + '</option>';
             for (var j = 0; j < list.length; j++) {
                 if (list[j].comName === 'Not available') {
                     text += '<option value="" selected>' + _('Not available') + '</option>';
@@ -63,13 +65,12 @@
         for (var key in settings) {
             if (!settings.hasOwnProperty(key)) continue;
             var $value = $('#' + key + '.value');
-            // example: select elements with id=key and class=value and insert value
             if ($value.attr('type') === 'checkbox') {
                 $value.prop('checked', settings[key]).change(function () {
                     onChange();
                 });
             } else {
-                $value.val(settings[key]).change(function () {
+                $value.val(settings[key].toString()).change(function () {
                     onChange();
                 }).keyup(onChange);
             }
