@@ -26,7 +26,7 @@
     "native": {
         "serialport": "",
         "baudrate":   34800,
-        "homebaseAddress": "123456"
+        "baseAddress": "123456"
     },
     "instanceObjects": [
         {
@@ -47,6 +47,31 @@
                 "read":  true,
                 "write": false,
                 "def":   false
+            },
+            "native": {}
+        },
+        {
+            "_id":  "info.limitOverflow",
+            "type": "state",
+            "common": {
+                "role":  "indicator",
+                "name":  "Send limit overflow",
+                "type":  "boolean",
+                "read":  true,
+                "write": false,
+                "def":   false
+            },
+            "native": {}
+        },
+        {
+            "_id":  "info.quota",
+            "type": "state",
+            "common": {
+                "role":  "state",
+                "name":  "Send quota",
+                "type":  "number",
+                "read":  true,
+                "write": false
             },
             "native": {}
         }

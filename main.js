@@ -10,6 +10,8 @@ var objects = {};
 var SerialPort;
 var devices = {};
 var timers = {};
+var limitOverflow = false;
+var credits = 0;
 
 var adapter = utils.adapter('maxcul');
 
@@ -19,12 +21,13 @@ adapter.on('stateChange', function (id, state) {
         adapter.log.warn('Unknown ID: ' + id);
         return;
     }
-    if (!objects[id].write) {
-        adapter.log.warn('Unknown id "' + id + '" is readonly');
+    if (!objects[id].common.write) {
+        adapter.log.warn('id "' + id + '" is readonly');
         return;
     }
     var channel = id.split('.');
     var name = channel.pop();
+    if (channel[channel.length - 1] === 'config') channel.pop();
     channel = channel.join('.');
 
     if (timers[channel]) clearTimeout(timers[channel].timer);
@@ -135,6 +138,14 @@ function sendTemperature(channel) {
 
 function sendInfo(channel) {
     if (!timers[channel]) return;
+
+    if (credits < 120) {
+        adapter.log.warn('Not enough credits. Wait for more...');
+        timers[channel].timer = setTimeout(function () {
+            sendInfo(channel);
+        }, 5000);
+        return;
+    }
 
     timers[channel].timer = null;
 
@@ -360,7 +371,7 @@ function createThermostat(data) {
 
     // comfortTemperature, ecoTemperature, minimumTemperature, maximumTemperature, offset, windowOpenTime, windowOpenTemperature
     if (!data.serial && data.raw) {
-        data.serial = hex2a(data.raw.substring(data.raw.length - 22, data.raw.length - 2));
+        data.serial = hex2a(data.raw.substring(data.raw.length - 20));
     }
 
     if (!data.serial) data.serial = data.src.toUpperCase();
@@ -386,7 +397,7 @@ function createThermostat(data) {
             states: {
                 0: 'auto',
                 1: 'manual',
-                2: 'boost'
+                3: 'boost'
             }
         },
         type: 'state',
@@ -483,7 +494,7 @@ function createThermostat(data) {
         common: {
             name: 'Thermostat ' + data.serial + ' comfort temperature',
             type: 'number',
-            read: false,
+            read: true,
             write: true,
             min: 4.5,
             max: 30.5,
@@ -500,7 +511,7 @@ function createThermostat(data) {
         common: {
             name: 'Thermostat ' + data.serial + ' eco temperature',
             type: 'number',
-            read: false,
+            read: true,
             write: true,
             min: 4.5,
             max: 30.5,
@@ -517,7 +528,7 @@ function createThermostat(data) {
         common: {
             name: 'Thermostat ' + data.serial + ' minimum temperature',
             type: 'number',
-            read: false,
+            read: true,
             write: true,
             min: 4.5,
             max: 30.5,
@@ -534,7 +545,7 @@ function createThermostat(data) {
         common: {
             name: 'Thermostat ' + data.serial + ' maximum temperature',
             type: 'number',
-            read: false,
+            read: true,
             write: true,
             min: 4.5,
             max: 30.5,
@@ -551,7 +562,7 @@ function createThermostat(data) {
         common: {
             name: 'Thermostat ' + data.serial + ' maximum temperature',
             type: 'number',
-            read: false,
+            read: true,
             write: true,
             min: 4.5,
             max: 30.5,
@@ -568,7 +579,7 @@ function createThermostat(data) {
         common: {
             name: 'Thermostat ' + data.serial + ' window open temperature',
             type: 'number',
-            read: false,
+            read: true,
             write: true,
             min: 4.5,
             max: 30.5,
@@ -585,7 +596,7 @@ function createThermostat(data) {
         common: {
             name: 'Thermostat ' + data.serial + ' window open time',
             type: 'number',
-            read: false,
+            read: true,
             write: true,
             role: 'level.interval',
             unit: 'sec'
@@ -622,7 +633,7 @@ function createButton(data) {
     //};
 
     if (!data.serial && data.raw) {
-        data.serial = hex2a(data.raw.substring(data.raw.length - 22, data.raw.length - 2));
+        data.serial = hex2a(data.raw.substring(data.raw.length - 20));
     }
 
     if (!data.serial) data.serial = data.src.toUpperCase();
@@ -706,7 +717,7 @@ function createContact(data) {
     //};
 
     if (!data.serial && data.raw) {
-        data.serial = hex2a(data.raw.substring(data.raw.length - 22, data.raw.length - 2));
+        data.serial = hex2a(data.raw.substring(data.raw.length - 20));
     }
 
     if (!data.serial) data.serial = data.src.toUpperCase();
@@ -790,7 +801,31 @@ function connect() {
 
     max = new Max(adapter.config.baseAddress, true, adapter.config.serialport, parseInt(adapter.config.baudrate, 10) || 9600);
 
+    setInterval(function () {
+        max.getCredits();
+    }, 5000);
+
+    max.on('creditsReceived', function (creidt, credit1) {
+        credits = parseInt(creidt, 10);
+        if (credits < 120) {
+            if (!limitOverflow) {
+                limitOverflow = true;
+                adapter.setState('info.limitOverflow', true, true);
+            }
+        } else {
+            if (limitOverflow) {
+                limitOverflow = false;
+                adapter.setState('info.limitOverflow', false, true);
+            }
+        }
+        adapter.setState('info.quota', credits, true);
+    });
+
     max.on('ShutterContactStateRecieved', function (data) {
+        if (limitOverflow) {
+            limitOverflow = false;
+            adapter.setState('info.limitOverflow', false, true);
+        }
         adapter.log.debug('ShutterContactStateRecieved: ' + JSON.stringify(data));
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
@@ -801,6 +836,10 @@ function connect() {
     });
 
     max.on('ThermostatStateRecieved', function (data) {
+        if (limitOverflow) {
+            limitOverflow = false;
+            adapter.setState('info.limitOverflow', false, true);
+        }
         //ThermostatStateRecieved: {"src":"160bd0","mode":1,"desiredTemperature":30.5,"valvePosition":100,"measuredTemperature":22.4,"dstSetting":1,"lanGateway":1,"panel":0,"rfError":0,"batteryLow":0,"untilString":""}
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
@@ -812,6 +851,10 @@ function connect() {
     });
 
     max.on('PushButtonStateRecieved', function (data) {
+        if (limitOverflow) {
+            limitOverflow = false;
+            adapter.setState('info.limitOverflow', false, true);
+        }
         adapter.log.debug('PushButtonStateRecieved: ' + JSON.stringify(data));
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
@@ -822,12 +865,21 @@ function connect() {
     });
 
     max.on('checkTimeIntervalFired', function () {
+        if (limitOverflow) {
+            limitOverflow = false;
+            adapter.setState('info.limitOverflow', false, true);
+        }
+
         adapter.log.info('checkTimeIntervalFired');
         adapter.logger.debug("Updating time information for deviceId");
         max.sendTimeInformation(adapter.config.baseAddress);
     });
 
     max.on('deviceRequestTimeInformation', function (src) {
+        if (limitOverflow) {
+            limitOverflow = false;
+            adapter.setState('info.limitOverflow', false, true);
+        }
         adapter.log.info('deviceRequestTimeInformation: ' + JSON.stringify(src));
         adapter.log.debug("Updating time information for deviceId " + src);
         if (devices[src]) {
@@ -835,7 +887,19 @@ function connect() {
         }
     });
 
+    max.on('LOVF', function () {
+        adapter.log.debug('LOVF: credits=' + credits);
+        if (!limitOverflow) {
+            limitOverflow = true;
+            adapter.setState('info.limitOverflow', true, true);
+        }
+    });
+
     max.on('PairDevice', function (data) {
+        if (limitOverflow) {
+            limitOverflow = false;
+            adapter.setState('info.limitOverflow', false, true);
+        }
         adapter.log.info('PairDevice: ' + JSON.stringify(data));
         if (data.type === 1 || data.type === 2 || data.type === 3) {
             createThermostat(data);
@@ -855,7 +919,7 @@ function connect() {
             max.emit('PairDevice', {
                 src: '160bd0',
                 type: 1,
-                raw: 'Z0110482034820394823049823409283402eert564756757568586769780'
+                raw: 'Z17000400160BD0123456001001A04E455130363731393837'
             });
         }, 100);
         
@@ -880,7 +944,7 @@ function connect() {
             max.emit('PairDevice', {
                 src: '160bd1',
                 type: 5,
-                raw: 'Z0110482034820394823049828908908903409283402eert564756757ABCDEF780'
+                raw: 'Z17000400160BD0123456001001A04E455130363731393839'
             });
         }, 300);
 
@@ -898,7 +962,7 @@ function connect() {
             max.emit('PairDevice', {
                 src: '160bd2',
                 type: 4,
-                raw: 'Z0110482034820394823046756858676978709823409283402eert564756757wffCDEF780'
+                raw: 'Z17000400160BD0123456001001A04E455130363731393838'
             });
         }, 300);
 
@@ -929,6 +993,7 @@ function main() {
                 }
             }
             connect();
+            adapter.subscribeStates('*');
         });
     });
 }

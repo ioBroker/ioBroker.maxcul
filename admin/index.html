@@ -60,9 +60,6 @@
 
     // the function loadSettings has to exist ...
     function load(settings, onChange) {
-        // example: select elements with id=key and class=value and insert value
-        if (!settings.type) settings.type = 'cul';
-
         for (var key in settings) {
             if (!settings.hasOwnProperty(key)) continue;
             var $value = $('#' + key + '.value');
@@ -73,14 +70,6 @@
                 });
             } else {
                 $value.val(settings[key]).change(function () {
-                    var id = $(this).attr('id');
-                    if (id === 'type') {
-                        if ($(this).val() === 'cul') {
-                            $('#baudrate').val('9600');
-                        } else {
-                            $('#baudrate').val('38400');
-                        }
-                    }
                     onChange();
                 }).keyup(onChange);
             }
@@ -112,14 +101,14 @@
                 obj[$this.attr('id')] = $this.val();
             }
         });
-        if (obj.homebaseAddress.length !== 6) {
+        if (obj.baseAddress.length !== 6) {
             window.alert(_('Base address must have 6 HEX Symbols'));
             return;
         }
-        obj.homebaseAddress = obj.homebaseAddress.toLowerCase();
-        for (var h = 0; h < obj.homebaseAddress.length; h++) {
-            if (obj.homebaseAddress[h] >= '0' && obj.homebaseAddress[h] <= '9') continue;
-            if (obj.homebaseAddress[h] >= 'a' && obj.homebaseAddress[h] <= 'f') continue;
+        obj.baseAddress = obj.baseAddress.toLowerCase();
+        for (var h = 0; h < obj.baseAddress.length; h++) {
+            if (obj.baseAddress[h] >= '0' && obj.baseAddress[h] <= '9') continue;
+            if (obj.baseAddress[h] >= 'a' && obj.baseAddress[h] <= 'f') continue;
             window.alert(_('Base address must have 6 HEX Symbols'));
             break;
         }
@@ -165,8 +154,8 @@
             </select></td>
         </tr>
         <tr>
-            <td><label  class="translate" for="homebaseAddress">Base address:</label></td>
-            <td><input id="homebaseAddress" maxlength="6" class="value" /></td>
+            <td><label  class="translate" for="baseAddress">Base address:</label></td>
+            <td><input id="baseAddress" maxlength="6" class="value" /></td>
         </tr>
     </table>
 
