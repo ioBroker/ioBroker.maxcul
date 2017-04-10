@@ -3,6 +3,9 @@
     "name": "bluefox",
     "email": "dogafox@gmail.com"
   },
+  "engines": {
+    "node": ">=0.12"
+  },
   "bugs": {
     "url": "https://github.com/ioBroker/ioBroker.maxcul/issues"
   },
