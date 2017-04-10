@@ -74,6 +74,18 @@
                 "write": false
             },
             "native": {}
+        },
+        {
+            "_id":  "info.version",
+            "type": "state",
+            "common": {
+                "role":  "state",
+                "name":  "CUL firmware version",
+                "type":  "string",
+                "read":  true,
+                "write": false
+            },
+            "native": {}
         }
     ]
 }

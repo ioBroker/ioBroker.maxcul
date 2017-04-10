@@ -10,8 +10,9 @@ var objects = {};
 var SerialPort;
 var devices = {};
 var timers = {};
-var limitOverflow = false;
+var limitOverflow = null;
 var credits = 0;
+var connected = false;
 
 var adapter = utils.adapter('maxcul');
 
@@ -40,6 +41,7 @@ adapter.on('stateChange', function (id, state) {
 });
 
 adapter.on('unload', function (callback) {
+    if (adapter && adapter.setState) adapter.setState('info.connection', false, true);
     if (max) max.disconnect();
     callback();
 });
@@ -793,7 +795,7 @@ function createContact(data) {
 }
 
 function connect() {
-	
+    adapter.setState('info.connection', false, true);
 	if (!adapter.config.serialport) {
         adapter.log.warn('Please define the serial port.');
         return;
@@ -812,6 +814,11 @@ function connect() {
     }, 5000);
 
     max.on('creditsReceived', function (creidt, credit1) {
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
+
         credits = parseInt(creidt, 10);
         if (credits < 120) {
             if (!limitOverflow) {
@@ -819,7 +826,7 @@ function connect() {
                 adapter.setState('info.limitOverflow', true, true);
             }
         } else {
-            if (limitOverflow) {
+            if (limitOverflow === null || limitOverflow) {
                 limitOverflow = false;
                 adapter.setState('info.limitOverflow', false, true);
             }
@@ -828,6 +835,10 @@ function connect() {
     });
 
     max.on('ShutterContactStateRecieved', function (data) {
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
         if (limitOverflow) {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
@@ -841,7 +852,19 @@ function connect() {
         }
     });
 
+    max.on('culFirmwareVersion', function (data) {
+        adapter.setState('info.version', data, true);
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
+    });
+
     max.on('ThermostatStateRecieved', function (data) {
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
         if (limitOverflow) {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
@@ -857,6 +880,10 @@ function connect() {
     });
 
     max.on('PushButtonStateRecieved', function (data) {
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
         if (limitOverflow) {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
@@ -871,6 +898,10 @@ function connect() {
     });
 
     max.on('checkTimeIntervalFired', function () {
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
         if (limitOverflow) {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
@@ -882,6 +913,10 @@ function connect() {
     });
 
     max.on('deviceRequestTimeInformation', function (src) {
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
         if (limitOverflow) {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
@@ -894,6 +929,10 @@ function connect() {
     });
 
     max.on('LOVF', function () {
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
         adapter.log.debug('LOVF: credits=' + credits);
         if (!limitOverflow) {
             limitOverflow = true;
@@ -902,6 +941,10 @@ function connect() {
     });
 
     max.on('PairDevice', function (data) {
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
         if (limitOverflow) {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
