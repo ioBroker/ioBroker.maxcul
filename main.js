@@ -14,6 +14,8 @@ var timers = {};
 var limitOverflow = null;
 var credits = 0;
 var connected = false;
+var creditsTimer;
+var thermostatTimer;
 
 try {
     serialport = require('serialport');
@@ -137,6 +139,7 @@ function sendConfig(channel) {
 
 function sendTemperature(channel) {
     if (!max) return;
+    adapter.log.debug('sendTemperature(' + channel + ', ' + timers[channel].desiredTemperature + ', ' + timers[channel].mode + ')');
     max.sendDesiredTemperature(
         objects[channel].native.src,
         timers[channel].desiredTemperature,
@@ -161,6 +164,8 @@ function sendInfo(channel) {
     timers[channel].timer = null;
 
     if (timers[channel].mode !== undefined || timers[channel].desiredTemperature !== undefined) {
+        timers[channel].requestRunning = false;
+
         var count1 = 0;
         if (timers[channel].mode === undefined) {
             count1++;
@@ -321,6 +326,9 @@ function processTasks() {
 function setStates(obj) {
     var id = obj.serial;
     var isStart = !tasks.length;
+    if (!devices[obj.data.src]) return;
+
+    devices[obj.data.src].lastReceived = new Date().getTime();
 
     for (var state in obj.data) {
         if (!obj.data.hasOwnProperty(state)) continue;
@@ -330,6 +338,17 @@ function setStates(obj) {
         var oid  = adapter.namespace + '.' + id + '.' + state;
         var meta = objects[oid];
         var val  = obj.data[state];
+
+        if (state === 'desiredTemperature' && timers[adapter.namespace + '.' + id] && timers[adapter.namespace + '.' + id].requestRunning) {
+            adapter.log.debug('Ignore desiredTemperature: ' + val);
+            timers[adapter.namespace + '.' + id].desiredTemperature = timers[adapter.namespace + '.' + id].requestRunning;
+
+            setTimeout(function (channel) {
+                sendInfo(channel);
+            }, 0, adapter.namespace + '.' + id);
+            continue;
+        }
+
         if (meta) {
             if (meta.common.type === 'boolean') {
                 val = val === 'true' || val === true || val === 1 || val === '1' || val === 'on';
@@ -571,7 +590,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.offset',
         common: {
-            name: 'Thermostat ' + data.serial + ' maximum temperature',
+            name: 'Thermostat ' + data.serial + ' offset temperature',
             type: 'number',
             read: true,
             write: true,
@@ -715,7 +734,7 @@ function createButton(data) {
         native: data
     };
     objs.push(obj);
-    
+
     syncObjects(objs);
 }
 
@@ -799,17 +818,46 @@ function createContact(data) {
         native: data
     };
     objs.push(obj);
-    
+
     syncObjects(objs);
+}
+
+function pollDevice(id) {
+    var src = objects[id].native.src;
+    if (credits < 400 || !devices[src]) {
+        return;
+    }
+    devices[src].lastReceived = new Date().getTime();
+    adapter.getForeignState(id + '.mode', function (err, state) {
+        adapter.getForeignState(id + '.desiredTemperature', function (err, stateTemp) {
+            if (state && state.val !== null && state.val !== undefined) {
+                var newVal = stateTemp.val;
+                var oldVal = stateTemp.val;
+                newVal = newVal + 0.5;
+                if (newVal > 30) newVal = 29.5;
+                var mode   = state.val;
+                timers[id] = timers[id] || {};
+                timers[id].requestRunning = oldVal;
+                adapter.log.info('Poll device1 : ' + mode + ', ' + newVal);
+
+                max.sendDesiredTemperature(
+                    src,
+                    newVal,
+                    mode,
+                    '00',
+                    objects[id].native.type);
+            }
+        });
+    });
 }
 
 function connect() {
     adapter.setState('info.connection', false, true);
-	if (!adapter.config.serialport) {
+    if (!adapter.config.serialport) {
         adapter.log.warn('Please define the serial port.');
         return;
     }
-	
+
     var env = {
         logger: adapter.log
     };
@@ -818,17 +866,30 @@ function connect() {
 
     max = new Max(adapter.config.baseAddress, true, adapter.config.serialport, parseInt(adapter.config.baudrate, 10) || 9600);
 
-    setInterval(function () {
+    creditsTimer = setInterval(function () {
         max.getCredits();
     }, 5000);
 
-    max.on('creditsReceived', function (creidt, credit1) {
+    if (adapter.config.scanner) {
+        thermostatTimer = setInterval(function () {
+            var now = new Date().getTime();
+            for (var id in objects) {
+                if (objects[id].type === 'channel' && (objects[id].native.type === 1 || objects[id].native.type === 2 || objects[id].native.type === 3)) {
+                    if (devices[objects[id].native.src] && (!devices[objects[id].native.src].lastReceived || now - devices[objects[id].native.src].lastReceived > adapter.config.scanner * 60000)) {
+                        pollDevice(id);
+                    }
+                }
+            }
+        }, 60000);
+    }
+
+    max.on('creditsReceived', function (credit, credit1) {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
         }
 
-        credits = parseInt(creidt, 10);
+        credits = parseInt(credit, 10);
         if (credits < 120) {
             if (!limitOverflow) {
                 limitOverflow = true;
@@ -980,7 +1041,7 @@ function connect() {
                 raw: 'Z17000400160BD0123456001001A04E455130363731393837'
             });
         }, 100);
-        
+
         setTimeout(function () {
             max.emit('ThermostatStateRecieved', {
                 src: '160bd0',
@@ -1039,6 +1100,9 @@ function connect() {
 }
 
 function main() {
+    if (adapter.config.scanner === undefined) adapter.config.scanner = 10;
+    adapter.config.scanner = parseInt(adapter.config.scanner, 10) || 0;
+
     adapter.objects.getObjectView('system', 'channel', {startkey: adapter.namespace + '.', endkey: adapter.namespace + '.\u9999'}, function (err, res) {
         for (var i = 0, l = res.rows.length; i < l; i++) {
             objects[res.rows[i].id] = res.rows[i].value;
@@ -1055,5 +1119,3 @@ function main() {
         });
     });
 }
-
-

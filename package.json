@@ -3,9 +3,6 @@
     "name": "bluefox",
     "email": "dogafox@gmail.com"
   },
-  "engines": {
-    "node": ">=0.12"
-  },
   "bugs": {
     "url": "https://github.com/ioBroker/ioBroker.maxcul/issues"
   },
@@ -64,5 +61,5 @@
   "scripts": {
     "test": "node node_modules/mocha/bin/mocha"
   },
-  "version": "0.1.1"
+  "version": "0.2.0"
 }

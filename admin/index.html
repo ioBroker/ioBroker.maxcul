@@ -8,6 +8,7 @@
 <link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
 <script type="text/javascript" src="../../js/translate.js"></script>
 <script type="text/javascript" src="../../js/adapter-settings.js"></script>
+<script type="text/javascript" src="words.js"></script>
 
 <style>
     .value {
@@ -15,19 +16,6 @@
     }
 </style>
 <script type="text/javascript">
-    systemDictionary = {
-        "MAX! CUL adapter settings":     {
-            "en": "MAX! CUL adapter settings",
-            "de": "MAX! CUL Adapter Einstellungen",
-            "ru": "Настройки MAX! CUL Драйвера"
-        },
-        "Serial port:":     {"en": "Serial port:",      "de": "Serialport:",     "ru": "Порт:"},
-        "Baud rate":        {"en": "Baud rate:",        "de": "Baud rate:",      "ru": "Скорость:"},
-        "Select port":      {"en": "Select port",       "de": "Port auswählen",  "ru": "Select port"},
-        "Base address:":    {"en": "Own base address:", "de": "Eigene Adresse:", "ru": "Собственный адрес:"},
-        "No ports found":   {"en": "No ports found",    "de": "Keine Ports gefunden", "ru": "Портов не найдено"}
-    };
-
     var timeout;
 
     function getComPorts(actualValue) {
@@ -62,6 +50,8 @@
 
     // the function loadSettings has to exist ...
     function load(settings, onChange) {
+        if (settings.scanner === undefined) settings.scanner = 10;
+
         for (var key in settings) {
             if (!settings.hasOwnProperty(key)) continue;
             var $value = $('#' + key + '.value');
@@ -158,6 +148,10 @@
             <td><label  class="translate" for="baseAddress">Base address:</label></td>
             <td><input id="baseAddress" maxlength="6" class="value" /></td>
         </tr>
+        <tr>
+        <td><label  class="translate" for="scanner">Scan interval (minutes):</label></td>
+        <td><input id="scanner" maxlength="6" class="value" type="number" /></td>
+    </tr>
     </table>
 
 </div>

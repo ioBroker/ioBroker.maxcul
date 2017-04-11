@@ -1,8 +1,13 @@
 {
     "common": {
         "name":                     "maxcul",
-        "version": "0.1.1",
+        "version": "0.2.0",
         "news": {
+            "0.2.0": {
+                "en": "Activate thermostat scanner",
+                "de": "Implementiere Thermostatskanner",
+                "ru": "Активирован опрос термостата"
+            },
             "0.1.1": {
                 "en": "intial commit",
                 "de": "intial commit",
@@ -26,7 +31,8 @@
     "native": {
         "serialport": "",
         "baudrate":   38400,
-        "baseAddress": "123456"
+        "baseAddress": "123456",
+        "scanner": 10
     },
     "instanceObjects": [
         {

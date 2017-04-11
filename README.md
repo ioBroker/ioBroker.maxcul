@@ -22,6 +22,9 @@ Before using you must first pair the devcies with ioBroker.
 E.g. for thermostats press longer the "boost" button till the countdown will start.
 
 ## Changelog
+### 0.2.0 (2017-04-11)
+* (bluefox) Activate thermostat scanner
+
 ### 0.1.1 (2017-04-10)
 * (bluefox) intial commit
 
