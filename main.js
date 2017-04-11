@@ -14,6 +14,8 @@ var timers = {};
 var limitOverflow = null;
 var credits = 0;
 var connected = false;
+var creditsTimer;
+var thermostatTimer;
 
 try {
     serialport = require('serialport');
@@ -161,6 +163,13 @@ function sendInfo(channel) {
     timers[channel].timer = null;
 
     if (timers[channel].mode !== undefined || timers[channel].desiredTemperature !== undefined) {
+        if (timers[channel].requestRunning) {
+            adapter.log.info('Temperature scanner runs for ' + channel + '. Wait...');
+            timers[channel].timer = setTimeout(function () {
+                sendInfo(channel);
+            }, 5000);
+            return;
+        }
         var count1 = 0;
         if (timers[channel].mode === undefined) {
             count1++;
@@ -322,6 +331,8 @@ function setStates(obj) {
     var id = obj.serial;
     var isStart = !tasks.length;
 
+    devices[obj.src].lastReceived = new Date().getTime();
+    
     for (var state in obj.data) {
         if (!obj.data.hasOwnProperty(state)) continue;
         if (state === 'src') continue;
@@ -802,6 +813,43 @@ function createContact(data) {
     
     syncObjects(objs);
 }
+function pollDevice(id) {
+    var src = objects[id].native.src;
+    if (credits < 400) {
+        return;
+    }
+    devices[src].lastReceived = new Date().getTime();
+    adapter.getForeignState(id + '.mode', function (err, state) {
+        adapter.getForeignState(id + '.desiredTemperature', function (err, stateTemp) {
+            if (state && state.val !== null && state.val !== undefined) {
+                var newVal = state.val - 1;
+                if (newVal - 1 < 0) newVal = 1;
+                if (newVal === 2) newVal = 1;
+                var oldVal = state.val;
+                var temp   = stateTemp.val;
+                timers[id] = timers[id] || {};
+                timers[id].requestRunning = true;
+                
+                max.sendDesiredTemperature(
+                    src,
+                    temp,
+                    newVal,
+                    '00',
+                    objects[id].native.type).then(function () {
+                        
+                    max.sendDesiredTemperature(
+                        src,
+                        temp,
+                        oldVal,
+                        '00',
+                        objects[id].native.type).then(function () {
+                        if (timers[id]) timers[id].requestRunning = false;
+                    });
+                });
+            }
+        });
+    });
+}
 
 function connect() {
     adapter.setState('info.connection', false, true);
@@ -818,9 +866,20 @@ function connect() {
 
     max = new Max(adapter.config.baseAddress, true, adapter.config.serialport, parseInt(adapter.config.baudrate, 10) || 9600);
 
-    setInterval(function () {
+    creditsTimer = setInterval(function () {
         max.getCredits();
     }, 5000);
+    
+    thermostatTimer = setInterval(function () {
+        var now = new Date().getTime();
+        for (var id in objects) {
+            if (objects[id].type === 'channel' && (objects[id].native.type === 1 || objects[id].native.type === 2 || objects[id].native.type === 3)) {
+                if (now - devices[objects[id].native.src].lastReceived > 600000) {
+                    pollDevice(id);
+                }
+            }
+        }
+    }, 60000);
 
     max.on('creditsReceived', function (creidt, credit1) {
         if (!connected) {
@@ -1055,5 +1114,3 @@ function main() {
         });
     });
 }
-
-
