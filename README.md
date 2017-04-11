@@ -1,4 +1,4 @@
-![Logo](admin/maxcul.jpg)
+![Logo](admin/maxcul.png)
 #ioBroker.maxcul
 ==================================
 [![NPM version](http://img.shields.io/npm/v/iobroker.maxcul.svg)](https://www.npmjs.com/package/iobroker.maxcul)
