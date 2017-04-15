@@ -1,8 +1,13 @@
 {
     "common": {
         "name":                     "maxcul",
-        "version": "0.2.0",
+        "version": "0.2.1",
         "news": {
+            "0.2.1": {
+                "en": "Fix calculation of serial number\nAdd valve configuration",
+                "de": "Korrigiere die Berechnung von Serialnummer\Ventilkonfiguration hinzugefügt",
+                "ru": "Исправлен поиск серийного номера\nДобавлены настройки вентиля"
+            },
             "0.2.0": {
                 "en": "Activate thermostat scanner",
                 "de": "Implementiere Thermostatskanner",
@@ -14,8 +19,17 @@
                 "ru": "intial commit"
             }
         },
+        "titleLang": {
+            "en": "max! CUL",
+            "de": "max! CUL",
+            "ru": "max! CUL"
+        },
         "title":                    "max! CUL",
-        "desc":                     "Control max! devices over CUL stick",
+        "desc":                     {
+            "en": "Control max! devices over CUL stick",
+            "de": "Steuere max! Geräte mit CUL stick",
+            "ru": "Управляет устройствами max! при помощи CUL"
+        },
         "platform":                 "javascript/Node.js",
         "mode":                     "daemon",
         "loglevel":                 "info",
@@ -25,7 +39,7 @@
         "icon":                     "maxcul.png",
         "extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/admin/maxcul.png",
         "keywords":                 ["cul", "MAX!", "868", "busware"],
-		"readme":                   "https://github.com/ioBroker/ioBroker.maxcul/blob/master/README.md",
+		"readme":                   "https://github.com/ioBroker/ioBroker.cul/blob/master/README.md",
 		"type":                     "hardware"
     },
     "native": {

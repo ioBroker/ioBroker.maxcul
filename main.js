@@ -39,16 +39,29 @@ adapter.on('stateChange', function (id, state) {
     }
     var channel = id.split('.');
     var name = channel.pop();
-    if (channel[channel.length - 1] === 'config') channel.pop();
+    var type = channel[channel.length - 1];
+    if (type === 'config' ||
+        type === 'displayConfig' ||
+        type === 'valveConfig') channel.pop();
+
     channel = channel.join('.');
 
-    if (timers[channel]) clearTimeout(timers[channel].timer);
+    if (name === 'display') {
+        if (!max) return;
+        if (state.val === 'false' || state.val === '0') state.val = false;
+        adapter.log.debug('sendSetDisplayActualTemperature(' + channel + ', ' + state.val + ')');
+        max.sendSetDisplayActualTemperature(
+            objects[channel].native.src,
+            state.val);
+    } else {
+        if (timers[channel]) clearTimeout(timers[channel].timer);
 
-    timers[channel] = timers[channel] || {};
-    timers[channel][name] = state.val;
-    timers[channel].timer = setTimeout(function (ch) {
-        sendInfo(ch);
-    }, 1000, channel);
+        timers[channel] = timers[channel] || {};
+        timers[channel][name] = state.val;
+        timers[channel].timer = setTimeout(function (ch) {
+            sendInfo(ch);
+        }, 1000, channel);
+    }
 });
 
 adapter.on('unload', function (callback) {
@@ -135,6 +148,26 @@ function sendConfig(channel) {
     delete timers[channel].windowOpenTime;
     delete timers[channel].offset;
     delete timers[channel].windowOpenTemperature;
+}
+
+function sendValveConfig(channel) {
+    if (!max) return;
+    max.sendConfigValve(
+        objects[channel].native.src,
+        timers[channel].boostDuration,
+        timers[channel].boostValvePosition,
+        timers[channel].decalcificationDay,
+        timers[channel].decalcificationHour,
+        timers[channel].maxValveSetting,
+        timers[channel].valveOffset,
+        objects[channel].native.type);
+
+    delete timers[channel].boostDuration;
+    delete timers[channel].boostValvePosition;
+    delete timers[channel].decalcificationDay;
+    delete timers[channel].decalcificationHour;
+    delete timers[channel].maxValveSetting;
+    delete timers[channel].valveOffset;
 }
 
 function sendTemperature(channel) {
@@ -279,6 +312,84 @@ function sendInfo(channel) {
         }
         if (!count2) sendConfig(channel);
     }
+
+    // comfortTemperature, ecoTemperature, minimumTemperature, maximumTemperature, offset, windowOpenTime, windowOpenTemperature
+    if (timers[channel].comfortTemperature      !== undefined ||
+        timers[channel].ecoTemperature          !== undefined ||
+        timers[channel].minimumTemperature      !== undefined ||
+        timers[channel].maximumTemperature      !== undefined ||
+        timers[channel].offset                  !== undefined ||
+        timers[channel].windowOpenTime          !== undefined ||
+        timers[channel].windowOpenTemperature   !== undefined) {
+        var count3 = 0;
+        if (timers[channel].boostDuration === undefined) {
+            count3++;
+            adapter.getForeignState(channel + '.boostDuration', function (err, state) {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 21;
+                }
+                timers[channel].boostDuration = state.val;
+                if (!--count3) sendValveConfig(channel);
+            });
+        }
+        if (timers[channel].boostValvePosition === undefined) {
+            count3++;
+            adapter.getForeignState(channel + '.boostValvePosition', function (err, state) {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 21;
+                }
+                timers[channel].boostValvePosition = state.val;
+                if (!--count3) sendValveConfig(channel);
+            });
+        }
+        if (timers[channel].decalcificationDay === undefined) {
+            count3++;
+            adapter.getForeignState(channel + '.decalcificationDay', function (err, state) {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 4.5;
+                }
+                timers[channel].decalcificationDay = state.val;
+                if (!--count3) sendValveConfig(channel);
+            });
+        }
+        if (timers[channel].decalcificationHour === undefined) {
+            count3++;
+            adapter.getForeignState(channel + '.decalcificationHour', function (err, state) {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 30.5;
+                }
+                timers[channel].decalcificationHour = state.val;
+                if (!--count3) sendValveConfig(channel);
+            });
+        }
+        if (timers[channel].maxValveSetting === undefined) {
+            count3++;
+            adapter.getForeignState(channel + '.maxValveSetting', function (err, state) {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel].maxValveSetting = state.val;
+                if (!--count3) sendValveConfig(channel);
+            });
+        }
+        if (timers[channel].valveOffset === undefined) {
+            count3++;
+            adapter.getForeignState(channel + '.valveOffset', function (err, state) {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel].valveOffset = state.val;
+                if (!--count3) sendValveConfig(channel);
+            });
+        }
+        if (!count3) sendValveConfig(channel);
+    }
 }
 
 var tasks = [];
@@ -379,8 +490,15 @@ function syncObjects(objs) {
 function hex2a(hexx) {
     var hex = hexx.toString();//force conversion
     var str = '';
-    for (var i = 0; i < hex.length; i += 2)
-        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    for (var i = 0; i < hex.length; i += 2) {
+        var s = String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+        // serial is ABC1324555
+        if ((s >= 'A' && s <= 'Z') || (s >= 'a' && s <= 'z') || (s >= '0' && s <= '9')) {
+            str += s;
+        } else {
+            return '';
+        }
+    }
     return str;
 }
 
@@ -651,6 +769,138 @@ function createThermostat(data) {
     };
     objs.push(obj);
 
+    obj = {
+        _id: adapter.namespace + '.' + data.serial + '.valveConfig.boostDuration',
+        common: {
+            name: 'Thermostat ' + data.serial + ' boost duration',
+            type: 'number',
+            read: true,
+            write: true,
+            min: 0,
+            max: 60,
+            role: 'level.duration',
+            unit: 'sec'
+        },
+        type: 'state',
+        native: data
+    };
+    objs.push(obj);
+
+    obj = {
+        _id: adapter.namespace + '.' + data.serial + '.valveConfig.boostValvePosition',
+        common: {
+            name: 'Thermostat ' + data.serial + ' boost valve position',
+            type: 'number',
+            read: true,
+            write: true,
+            min: 0,
+            max: 100,
+            role: 'level.valve',
+            unit: '%'
+        },
+        type: 'state',
+        native: data
+    };
+    objs.push(obj);
+
+    obj = {
+        _id: adapter.namespace + '.' + data.serial + '.valveConfig.decalcificationDay',
+        common: {
+            name: 'Thermostat ' + data.serial + ' decalcification week day',
+            type: 'number',
+            read: true,
+            write: true,
+            min: 0,
+            max: 6,
+            states: {
+                0: 'Sunday',
+                1: 'Monday',
+                2: 'Tuesday',
+                3: 'Wednesday',
+                4: 'Thursday',
+                5: 'Friday',
+                6: 'Saturday'
+            },
+            role: 'level.day',
+            unit: '%'
+        },
+        type: 'state',
+        native: data
+    };
+    objs.push(obj);
+
+    obj = {
+        _id: adapter.namespace + '.' + data.serial + '.valveConfig.decalcificationHour',
+        common: {
+            name: 'Thermostat ' + data.serial + ' decalcification hour',
+            type: 'number',
+            read: true,
+            write: true,
+            min: 0,
+            max: 23,
+            role: 'level.hour',
+            unit: 'hour'
+        },
+        type: 'state',
+        native: data
+    };
+    objs.push(obj);
+
+    obj = {
+        _id: adapter.namespace + '.' + data.serial + '.valveConfig.maxValveSetting',
+        common: {
+            name: 'Thermostat ' + data.serial + ' max valve position',
+            type: 'number',
+            read: true,
+            write: true,
+            min: 0,
+            max: 100,
+            role: 'level.valve',
+            unit: '%'
+        },
+        type: 'state',
+        native: data
+    };
+    objs.push(obj);
+
+    obj = {
+        _id: adapter.namespace + '.' + data.serial + '.valveConfig.valveOffset',
+        common: {
+            name: 'Thermostat ' + data.serial + ' valve offset',
+            type: 'number',
+            read: true,
+            write: true,
+            min: 0,
+            max: 100,
+            role: 'level.valve',
+            unit: '%'
+        },
+        type: 'state',
+        native: data
+    };
+    objs.push(obj);
+
+    syncObjects(objs);
+}
+
+function createWallThermostat(data) {
+    createThermostat(data);
+
+    var objs = [obj];
+    var obj = {
+        _id: adapter.namespace + '.' + data.serial + '.displayConfig.display',
+        common: {
+            name:  'Thermostat ' + data.serial + ' display',
+            type:  'boolean',
+            desc:  'Display actual temperature',
+            role:  'switch',
+            read:  true,
+            write: true
+        },
+        type:  'state',
+        native: data
+    };
+    objs.push(obj);
     syncObjects(objs);
 }
 
@@ -1022,6 +1272,8 @@ function connect() {
         adapter.log.info('PairDevice: ' + JSON.stringify(data));
         if (data.type === 1 || data.type === 2 || data.type === 3) {
             createThermostat(data);
+        } else if (data.type === 3) {
+            createWallThermostat(data);
         } else if (data.type === 4) {
             createContact(data);
         } else if (data.type === 5) {
