@@ -1,9 +1,9 @@
 {
     "common": {
         "name":                     "maxcul",
-        "version": "0.2.2",
+        "version": "0.2.3",
         "news": {
-            "0.2.2": {
+            "0.2.3": {
                 "en": "Fix calculation of serial number\nAdd valve configuration",
                 "de": "Korrigiere die Berechnung von Serialnummer\nVentilkonfiguration hinzugefügt",
                 "ru": "Исправлен поиск серийного номера\nДобавлены настройки вентиля"
