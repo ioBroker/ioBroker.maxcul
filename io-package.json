@@ -39,7 +39,7 @@
         "icon":                     "maxcul.png",
         "extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/admin/maxcul.png",
         "keywords":                 ["cul", "MAX!", "868", "busware"],
-		"readme":                   "https://github.com/ioBroker/ioBroker.cul/blob/master/README.md",
+		"readme":                   "https://github.com/ioBroker/ioBroker.maxcul/blob/master/README.md",
 		"type":                     "hardware"
     },
     "native": {
