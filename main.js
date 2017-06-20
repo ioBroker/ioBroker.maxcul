@@ -235,7 +235,7 @@ function sendInfo(channel) {
         var count2 = 0;
         if (timers[channel].comfortTemperature === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.comfortTemperature', function (err, state) {
+            adapter.getForeignState(channel + '.config.comfortTemperature', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 21;
@@ -246,10 +246,10 @@ function sendInfo(channel) {
         }
         if (timers[channel].ecoTemperature === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.ecoTemperature', function (err, state) {
+            adapter.getForeignState(channel + '.config.ecoTemperature', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
-                    state.val = 21;
+                    state.val = 17;
                 }
                 timers[channel].ecoTemperature = state.val;
                 if (!--count2) sendConfig(channel);
@@ -257,7 +257,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].minimumTemperature === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.minimumTemperature', function (err, state) {
+            adapter.getForeignState(channel + '.config.minimumTemperature', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 4.5;
@@ -268,7 +268,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].maximumTemperature === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.maximumTemperature', function (err, state) {
+            adapter.getForeignState(channel + '.config.maximumTemperature', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 30.5;
@@ -279,7 +279,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].offset === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.offset', function (err, state) {
+            adapter.getForeignState(channel + '.config.offset', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 0;
@@ -290,10 +290,10 @@ function sendInfo(channel) {
         }
         if (timers[channel].windowOpenTime === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.windowOpenTime', function (err, state) {
+            adapter.getForeignState(channel + '.config.windowOpenTime', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
-                    state.val = 0;
+                    state.val = 10;
                 }
                 timers[channel].windowOpenTime = state.val;
                 if (!--count2) sendConfig(channel);
@@ -301,7 +301,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].windowOpenTemperature === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.windowOpenTemperature', function (err, state) {
+            adapter.getForeignState(channel + '.config.windowOpenTemperature', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 12;
@@ -313,21 +313,21 @@ function sendInfo(channel) {
         if (!count2) sendConfig(channel);
     }
 
-    // comfortTemperature, ecoTemperature, minimumTemperature, maximumTemperature, offset, windowOpenTime, windowOpenTemperature
-    if (timers[channel].comfortTemperature      !== undefined ||
-        timers[channel].ecoTemperature          !== undefined ||
-        timers[channel].minimumTemperature      !== undefined ||
-        timers[channel].maximumTemperature      !== undefined ||
-        timers[channel].offset                  !== undefined ||
-        timers[channel].windowOpenTime          !== undefined ||
-        timers[channel].windowOpenTemperature   !== undefined) {
+    // boostDuration, boostValvePosition, decalcificationDay, decalcificationHour, maxValveSetting, valveOffset
+    if (timers[channel].boostDuration         !== undefined ||
+        timers[channel].boostValvePosition    !== undefined ||
+        timers[channel].decalcificationDay    !== undefined ||
+        timers[channel].decalcificationHour   !== undefined ||
+        timers[channel].maxValveSetting       !== undefined ||
+        timers[channel].valveOffset           !== undefined) {
+        
         var count3 = 0;
         if (timers[channel].boostDuration === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.boostDuration', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.boostDuration', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
-                    state.val = 21;
+                    state.val = 5;
                 }
                 timers[channel].boostDuration = state.val;
                 if (!--count3) sendValveConfig(channel);
@@ -335,10 +335,10 @@ function sendInfo(channel) {
         }
         if (timers[channel].boostValvePosition === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.boostValvePosition', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.boostValvePosition', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
-                    state.val = 21;
+                    state.val = 100;
                 }
                 timers[channel].boostValvePosition = state.val;
                 if (!--count3) sendValveConfig(channel);
@@ -346,10 +346,10 @@ function sendInfo(channel) {
         }
         if (timers[channel].decalcificationDay === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.decalcificationDay', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.decalcificationDay', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
-                    state.val = 4.5;
+                    state.val = 0;
                 }
                 timers[channel].decalcificationDay = state.val;
                 if (!--count3) sendValveConfig(channel);
@@ -357,10 +357,10 @@ function sendInfo(channel) {
         }
         if (timers[channel].decalcificationHour === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.decalcificationHour', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.decalcificationHour', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
-                    state.val = 30.5;
+                    state.val = 12;
                 }
                 timers[channel].decalcificationHour = state.val;
                 if (!--count3) sendValveConfig(channel);
@@ -368,10 +368,10 @@ function sendInfo(channel) {
         }
         if (timers[channel].maxValveSetting === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.maxValveSetting', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.maxValveSetting', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
-                    state.val = 0;
+                    state.val = 100;
                 }
                 timers[channel].maxValveSetting = state.val;
                 if (!--count3) sendValveConfig(channel);
@@ -379,7 +379,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].valveOffset === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.valveOffset', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.valveOffset', function (err, state) {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 0;
@@ -1228,7 +1228,7 @@ function connect() {
         }
 
         adapter.log.info('checkTimeIntervalFired');
-        adapter.logger.debug("Updating time information for deviceId");
+        adapter.log.debug("Updating time information for deviceId");
         max.sendTimeInformation(adapter.config.baseAddress);
     });
 
