@@ -1,8 +1,13 @@
 {
     "common": {
         "name":                     "maxcul",
-        "version": "0.2.3",
+        "version": "0.3.0",
         "news": {
+            "0.3.0": {
+                "en": "Fix control of thermostates",
+                "de": "Korrigiere die Steuerung von Thermostaten",
+                "ru": "Исправлено управление термостатами"
+            },
             "0.2.3": {
                 "en": "Fix calculation of serial number\nAdd valve configuration",
                 "de": "Korrigiere die Berechnung von Serialnummer\nVentilkonfiguration hinzugefügt",
