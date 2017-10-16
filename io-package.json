@@ -1,6 +1,6 @@
 {
     "common": {
-        "name":                     "maxcul",
+        "name": "maxcul",
         "version": "0.3.0",
         "news": {
             "0.3.0": {
@@ -29,33 +29,44 @@
             "de": "max! CUL",
             "ru": "max! CUL"
         },
-        "title":                    "max! CUL",
-        "desc":                     {
+        "title": "max! CUL",
+        "desc": {
             "en": "Control max! devices over CUL stick",
             "de": "Steuere max! Geräte mit CUL stick",
             "ru": "Управляет устройствами max! при помощи CUL"
         },
-        "platform":                 "javascript/Node.js",
-        "mode":                     "daemon",
-        "loglevel":                 "info",
-        "license":                  "GPL-2.0",
-        "enabled":                  true,
-        "messagebox":               true,
-        "icon":                     "maxcul.png",
-        "extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/admin/maxcul.png",
-        "keywords":                 ["cul", "MAX!", "868", "busware"],
-		"readme":                   "https://github.com/ioBroker/ioBroker.maxcul/blob/master/README.md",
-		"type":                     "hardware"
+        "platform": "javascript/Node.js",
+        "mode": "daemon",
+        "loglevel": "info",
+        "license": "GPL-2.0",
+        "enabled": true,
+        "messagebox": true,
+        "icon": "maxcul.png",
+        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/admin/maxcul.png",
+        "keywords": [
+            "cul",
+            "MAX!",
+            "868",
+            "busware"
+        ],
+        "readme": "https://github.com/ioBroker/ioBroker.maxcul/blob/master/README.md",
+        "type": "iot-systems",
+        "authors": [
+            {
+                "name": "bluefox",
+                "email": "dogafox@gmail.com"
+            }
+        ]
     },
     "native": {
         "serialport": "",
-        "baudrate":   38400,
+        "baudrate": 38400,
         "baseAddress": "123456",
         "scanner": 10
     },
     "instanceObjects": [
         {
-            "_id":  "info",
+            "_id": "info",
             "type": "channel",
             "common": {
                 "name": "Information"
@@ -63,51 +74,51 @@
             "native": {}
         },
         {
-            "_id":  "info.connection",
+            "_id": "info.connection",
             "type": "state",
             "common": {
-                "role":  "indicator.connected",
-                "name":  "If connected to CUL",
-                "type":  "boolean",
-                "read":  true,
+                "role": "indicator.connected",
+                "name": "If connected to CUL",
+                "type": "boolean",
+                "read": true,
                 "write": false,
-                "def":   false
+                "def": false
             },
             "native": {}
         },
         {
-            "_id":  "info.limitOverflow",
+            "_id": "info.limitOverflow",
             "type": "state",
             "common": {
-                "role":  "indicator",
-                "name":  "Send limit overflow",
-                "type":  "boolean",
-                "read":  true,
+                "role": "indicator",
+                "name": "Send limit overflow",
+                "type": "boolean",
+                "read": true,
                 "write": false,
-                "def":   false
+                "def": false
             },
             "native": {}
         },
         {
-            "_id":  "info.quota",
+            "_id": "info.quota",
             "type": "state",
             "common": {
-                "role":  "state",
-                "name":  "Send quota",
-                "type":  "number",
-                "read":  true,
+                "role": "state",
+                "name": "Send quota",
+                "type": "number",
+                "read": true,
                 "write": false
             },
             "native": {}
         },
         {
-            "_id":  "info.version",
+            "_id": "info.version",
             "type": "state",
             "common": {
-                "role":  "state",
-                "name":  "CUL firmware version",
-                "type":  "string",
-                "read":  true,
+                "role": "state",
+                "name": "CUL firmware version",
+                "type": "string",
+                "read": true,
                 "write": false
             },
             "native": {}
