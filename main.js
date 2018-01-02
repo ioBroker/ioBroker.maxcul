@@ -25,7 +25,7 @@ try {
 }
 
 
-var adapter = utils.adapter('maxcul');
+var adapter = utils.Adapter('maxcul');
 
 adapter.on('stateChange', function (id, state) {
     if (!id || !state || state.ack) return;
