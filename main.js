@@ -18,8 +18,7 @@ var creditsTimer;
 var thermostatTimer;
 
 try {
-    serialport = require('serialport');
-    SerialPort = serialport.SerialPort;
+    SerialPort = require('serialport');
 } catch (err) {
     console.error('Cannot load serialport module');
 }
@@ -77,9 +76,9 @@ adapter.on('message', function (obj) {
         switch (obj.command) {
             case 'listUart':
                 if (obj.callback) {
-                    if (serialport) {
+                    if (SerialPort) {
                         // read all found serial ports
-                        serialport.list(function (err, ports) {
+                        SerialPort.list(function (err, ports) {
                             adapter.log.info('List of port: ' + JSON.stringify(ports));
                             adapter.sendTo(obj.from, obj.command, ports, obj.callback);
                         });
@@ -102,17 +101,17 @@ function checkPort(callback) {
     var sPort;
     try {
         sPort = new SerialPort(adapter.config.serialport || '/dev/ttyACM0', {
-            baudrate: parseInt(adapter.config.baudrate, 10) || 9600,
+            baudRate: parseInt(adapter.config.baudrate, 10) || 9600,
             autoOpen: false
         });
         sPort.on('error', function (err) {
-            if (sPort.isOpen()) sPort.close();
+            if (sPort.isOpen) sPort.close();
             if (callback) callback(err);
             callback = null;
         });
 
         sPort.open(function (err) {
-            if (sPort.isOpen()) sPort.close();
+            if (sPort.isOpen) sPort.close();
 
             if (callback) callback(err);
             callback = null;
@@ -120,7 +119,7 @@ function checkPort(callback) {
     } catch (e) {
         adapter.log.error('Cannot open port: ' + e);
         try {
-            if (sPort.isOpen()) sPort.close();
+            if (sPort.isOpen) sPort.close();
         } catch (ee) {
 
         }
@@ -320,7 +319,7 @@ function sendInfo(channel) {
         timers[channel].decalcificationHour   !== undefined ||
         timers[channel].maxValveSetting       !== undefined ||
         timers[channel].valveOffset           !== undefined) {
-        
+
         var count3 = 0;
         if (timers[channel].boostDuration === undefined) {
             count3++;

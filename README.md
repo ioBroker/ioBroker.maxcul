@@ -18,10 +18,13 @@ Adapter is derived from [pimatic-maxcul](https://github.com/fbeek/pimatic-maxcul
 - Push button
 
 ## Usage
-Before using you must first pair the devcies with ioBroker. 
+Before using you must first pair the devcies with ioBroker.
 E.g. for thermostats press longer the "boost" button till the countdown will start.
 
 ## Changelog
+### 0.4.0 (2018-01-24)
+* (Apollon77) Upgrade Serialport and cul library
+
 ### 0.3.0 (2017-06-21)
 * (bowao) Fix control of thermostates
 
