@@ -4,9 +4,9 @@
         "version": "0.4.1",
         "news": {
             "0.4.1": {
-                "en": "Upgrade dependecies",
+                "en": "Upgrade dependencies",
                 "de": "Abhängigkeiten aktualisiert",
-                "ru": "Upgrade dependecies"
+                "ru": "Upgrade dependencies"
             },
             "0.4.0": {
                 "en": "Upgrade Serialport and cul library",

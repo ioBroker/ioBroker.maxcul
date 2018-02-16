@@ -23,7 +23,7 @@ E.g. for thermostats press longer the "boost" button till the countdown will sta
 
 ## Changelog
 ### 0.4.1 (2018-02-15)
-* (Apollon77) Upgrade dependecies
+* (Apollon77) Upgrade dependencies
 
 ### 0.4.0 (2018-01-24)
 * (Apollon77) Upgrade Serialport and cul library
