@@ -8,6 +8,7 @@ var utils = require(__dirname + '/lib/utils'); // Get common adapter utils
 var max;
 var objects = {};
 var SerialPort;
+var Readline;
 var serialport;
 var devices = {};
 var timers = {};
@@ -19,6 +20,7 @@ var thermostatTimer;
 
 try {
     SerialPort = require('serialport');
+    Readline = SerialPort.parsers.Readline;
 } catch (err) {
     console.error('Cannot load serialport module');
 }
@@ -102,7 +104,8 @@ function checkPort(callback) {
     try {
         sPort = new SerialPort(adapter.config.serialport || '/dev/ttyACM0', {
             baudRate: parseInt(adapter.config.baudrate, 10) || 9600,
-            autoOpen: false
+            autoOpen: false,
+            parser: new Readline({delimiter: '\r\n'})
         });
         sPort.on('error', function (err) {
             if (sPort.isOpen) sPort.close();
@@ -1153,7 +1156,7 @@ function connect() {
         adapter.setState('info.quota', credits, true);
     });
 
-    max.on('ShutterContactStateRecieved', function (data) {
+    max.on('ShutterContactStateReceived', function (data) {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1162,7 +1165,7 @@ function connect() {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
         }
-        adapter.log.debug('ShutterContactStateRecieved: ' + JSON.stringify(data));
+        adapter.log.debug('ShutterContactStateReceived: ' + JSON.stringify(data));
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
         } else {
@@ -1179,7 +1182,7 @@ function connect() {
         }
     });
 
-    max.on('ThermostatStateRecieved', function (data) {
+    max.on('ThermostatStateReceived', function (data) {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1188,17 +1191,17 @@ function connect() {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
         }
-        //ThermostatStateRecieved: {"src":"160bd0","mode":1,"desiredTemperature":30.5,"valvePosition":100,"measuredTemperature":22.4,"dstSetting":1,"lanGateway":1,"panel":0,"rfError":0,"batteryLow":0,"untilString":""}
+        //ThermostatStateReceived: {"src":"160bd0","mode":1,"desiredTemperature":30.5,"valvePosition":100,"measuredTemperature":22.4,"dstSetting":1,"lanGateway":1,"panel":0,"rfError":0,"batteryLow":0,"untilString":""}
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
         } else {
             adapter.log.warn('Unknown device: ' + JSON.stringify(data));
             createThermostat(data);
         }
-        adapter.log.debug('ThermostatStateRecieved: ' + JSON.stringify(data));
+        adapter.log.debug('ThermostatStateReceived: ' + JSON.stringify(data));
     });
 
-    max.on('PushButtonStateRecieved', function (data) {
+    max.on('PushButtonStateReceived', function (data) {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1207,7 +1210,7 @@ function connect() {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
         }
-        adapter.log.debug('PushButtonStateRecieved: ' + JSON.stringify(data));
+        adapter.log.debug('PushButtonStateReceived: ' + JSON.stringify(data));
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
         } else {
@@ -1294,7 +1297,7 @@ function connect() {
         }, 100);
 
         setTimeout(function () {
-            max.emit('ThermostatStateRecieved', {
+            max.emit('ThermostatStateReceived', {
                 src: '160bd0',
                 mode: 1,
                 desiredTemperature: 30.5,
@@ -1319,7 +1322,7 @@ function connect() {
         }, 300);
 
         setTimeout(function () {
-            max.emit('PushButtonStateRecieved', {
+            max.emit('PushButtonStateReceived', {
                 src: '160bd1',
                 pressed: 1,
                 rfError: 1,
@@ -1337,7 +1340,7 @@ function connect() {
         }, 300);
 
         setTimeout(function () {
-            max.emit('ShutterContactStateRecieved', {
+            max.emit('ShutterContactStateReceived', {
                 src: '160bd2',
                 isOpen: 0,
                 rfError: 0,
