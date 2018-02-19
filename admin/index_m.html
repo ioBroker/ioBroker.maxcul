@@ -1,20 +1,18 @@
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
-<script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
-<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
-<script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
+    <meta charset="UTF-8">
+    <!-- Materialze style -->
+    <link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
 
-<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
-<script type="text/javascript" src="../../js/translate.js"></script>
-<script type="text/javascript" src="../../js/adapter-settings.js"></script>
-<script type="text/javascript" src="words.js"></script>
+    <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
 
-<style>
-    .value {
-        width: 250px;
-    }
-</style>
+    <script type="text/javascript" src="../../js/translate.js"></script>
+    <script type="text/javascript" src="../../lib/js/materialize.js"></script>
+    <script type="text/javascript" src="../../js/adapter-settings.js"></script>
+    <script type="text/javascript" src="words.js"></script>
+
 <script type="text/javascript">
     var timeout;
     var count = 0;
@@ -49,7 +47,7 @@
                     text += '<option value="' + list[j].comName + '" ' + ((actualValue === list[j].comName) ? 'selected' : '') + '>' + list[j].comName + '</option>';
                 }
             }
-            $serialport.html(text);
+            $serialport.html(text).select();
         });
     }
 
@@ -75,8 +73,11 @@
             if (isAlive || common.enabled) {
                 getComPorts(settings.serialport);
             } else {
-                $('#_serialport').html('<input id="serialport" class="value" value="' + settings.serialport + '"/>');
+                var $select = $('#_serialport').find('select');
+                $select.select('destroy');
+                $select.replaceWith('<input id="serialport" class="value" value="' + settings.serialport + '"/>');
                 $('#serialport').on('change', onChange).on('keyup', onChange);
+                M.updateTextFields();
             }
         });
 
@@ -84,10 +85,7 @@
         onChange(false);
     }
 
-    // ... and the function save has to exist.
-    // you have to make sure the callback is called with the settings object as first param!
     function save(callback) {
-        // example: select elements with class=value and build settings object
         var obj = {};
         $('.value').each(function () {
             var $this = $(this);
@@ -98,43 +96,50 @@
             }
         });
         if (obj.baseAddress.length !== 6) {
-            window.alert(_('Base address must have 6 HEX Symbols'));
+            showMessage(_('Base address must have 6 HEX Symbols'));
             return;
         }
         obj.baseAddress = obj.baseAddress.toLowerCase();
         for (var h = 0; h < obj.baseAddress.length; h++) {
             if (obj.baseAddress[h] >= '0' && obj.baseAddress[h] <= '9') continue;
             if (obj.baseAddress[h] >= 'a' && obj.baseAddress[h] <= 'f') continue;
-            window.alert(_('Base address must have 6 HEX Symbols'));
+            showMessage(_('Base address must have 6 HEX Symbols'));
             break;
         }
         callback(obj);
     }
 
 </script>
+<style>
+    .m .select-wrapper+label {
+        top: 100%;
+    }
+</style>
 </head>
 <body>
-<div id="adapter-container">
-    <table><tr><td><img src="maxcul.png" width="64" height="64"></td><td><h3 class="translate">MAX! CUL adapter settings</h3></td></tr></table>
-
-
+<div class="m adapter-container">
+    <div class="row">
+        <div class="col s12 m4 l2">
+            <img src="maxcul.png" class="logo">
+        </div>
+    </div>
     <!--"serialport": "/dev/ttyACM0",
-    "baudrate":   9600,
-    "mode":       "SlowRF",
-    "parse":      true,
-    "init":       true,
-    "coc":        false,
-    "rssi":       true -->
+"baudrate":   9600,
+"mode":       "SlowRF",
+"parse":      true,
+"init":       true,
+"coc":        false,
+"rssi":       true -->
+    <div class="row">
+        <div class="col s12 m4" id="_serialport">
+            <select id="serialport" class="value"></select>
+            <label class="translate" for="serialport">Serial port:</label>
+        </div>
+    </div>
 
-
-    <table>
-        <tr>
-            <td><label class="translate" for="serialport">Serial port:</label></td>
-            <td id="_serialport"><select id="serialport" class="value"></select></td>
-        </tr>
-        <tr>
-            <td><label class="translate" for="baudrate">Baud rate</label></td>
-            <td><select id="baudrate"   class="value">
+    <div class="row">
+        <div class="col s12 m4">
+            <select id="baudrate" class="value">
                 <option value="110">110</option>
                 <option value="150">150</option>
                 <option value="300">300</option>
@@ -148,17 +153,22 @@
                 <option value="56000">56000</option>
                 <option value="57600">57600</option>
                 <option value="115200">115200</option>
-            </select></td>
-        </tr>
-        <tr>
-            <td><label class="translate" for="baseAddress">Base address:</label></td>
-            <td><input id="baseAddress" maxlength="6" class="value" /></td>
-        </tr>
-        <tr>
-        <td><label class="translate" for="scanner">Scan interval (minutes):</label></td>
-        <td><input id="scanner" maxlength="6" class="value" type="number" /></td>
-    </tr>
-    </table>
+            </select>
+            <label class="translate" for="baudrate">Baud rate</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12 m4">
+            <input id="baseAddress" maxlength="6" class="value" type="text"/>
+            <label class="translate" for="baseAddress">Base address:</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12 m4">
+            <input id="scanner" maxlength="6" class="value" type="number" min="0"/>
+            <label class="translate" for="scanner">Scan interval (minutes):</label>
+        </div>
+    </div>
 </div>
 </body>
 </html>
