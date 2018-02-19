@@ -3,6 +3,17 @@
         "name": "maxcul",
         "version": "0.4.2",
         "news": {
+            "0.4.2": {
+                "en": "Fix Serial data parsing",
+                "de": "Reparieren der seriellen Datenanalyse",
+                "ru": "Исправить синтаксический анализ последовательных данных",
+                "pt": "Fixar análise de dados em série",
+                "nl": "Lossen van seriële gegevens op",
+                "fr": "Correction de l'analyse des données série",
+                "it": "Correzione dell'analisi dei dati seriali",
+                "es": "Repara el análisis de datos en serie",
+                "pl": "Napraw szeregowe przetwarzanie danych"
+            },
             "0.4.1": {
                 "en": "Upgrade dependencies",
                 "de": "Abhängigkeiten aktualisiert",
