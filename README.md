@@ -24,6 +24,7 @@ E.g. for thermostats press longer the "boost" button till the countdown will sta
 ## Changelog
 ### 0.4.2 (2018-02-19)
 * (Apollon77) Fix Serial data parsing
+* (bluefox) Admin3 ready
 
 ### 0.4.1 (2018-02-15)
 * (Apollon77) Upgrade dependencies
@@ -46,4 +47,4 @@ E.g. for thermostats press longer the "boost" button till the countdown will sta
 
 ## License
 
-[Licensed under GPLv2](LICENSE) Copyright (c) 2017 bluefox
+[Licensed under GPLv2](LICENSE) Copyright (c) 2017-2018 bluefox
