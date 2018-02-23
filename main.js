@@ -9,7 +9,6 @@ var max;
 var objects = {};
 var SerialPort;
 var Readline;
-var serialport;
 var devices = {};
 var timers = {};
 var limitOverflow = null;
@@ -20,7 +19,6 @@ var thermostatTimer;
 
 try {
     SerialPort = require('serialport');
-    Readline = SerialPort.parsers.Readline;
 } catch (err) {
     console.error('Cannot load serialport module');
 }
@@ -104,17 +102,16 @@ function checkPort(callback) {
     try {
         sPort = new SerialPort(adapter.config.serialport || '/dev/ttyACM0', {
             baudRate: parseInt(adapter.config.baudrate, 10) || 9600,
-            autoOpen: false,
-            parser: new Readline({delimiter: '\r\n'})
+            autoOpen: false
         });
         sPort.on('error', function (err) {
-            if (sPort.isOpen) sPort.close();
+            if (sPort.isOpen()) sPort.close();
             if (callback) callback(err);
             callback = null;
         });
 
         sPort.open(function (err) {
-            if (sPort.isOpen) sPort.close();
+            if (sPort.isOpen()) sPort.close();
 
             if (callback) callback(err);
             callback = null;
@@ -122,7 +119,7 @@ function checkPort(callback) {
     } catch (e) {
         adapter.log.error('Cannot open port: ' + e);
         try {
-            if (sPort.isOpen) sPort.close();
+            if (sPort.isOpen()) sPort.close();
         } catch (ee) {
 
         }
