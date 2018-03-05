@@ -444,6 +444,7 @@ function setStates(obj) {
         if (!obj.data.hasOwnProperty(state)) continue;
         if (state === 'src') continue;
         if (state === 'serial') continue;
+        if (obj.data[state] === undefined) continue;
 
         var oid  = adapter.namespace + '.' + id + '.' + state;
         var meta = objects[oid];
