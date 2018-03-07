@@ -1,8 +1,19 @@
 {
     "common": {
         "name": "maxcul",
-        "version": "0.5.1",
+        "version": "0.5.2",
         "news": {
+            "0.5.2": {
+                "en": "Several fixes in communication for nanoCul and Logic",
+                "de": "Mehrere Fehler in der Kommunikation für nanoCul und Logic",
+                "ru": "Несколько исправлений в общении для nanoCul и Logic",
+                "pt": "Várias correcções na comunicação para nanoCul e Logic",
+                "nl": "Verschillende oplossingen voor communicatie voor nanoCul en Logic",
+                "fr": "Plusieurs correctifs dans la communication pour nanoCul et Logic",
+                "it": "Diverse correzioni nella comunicazione per nanoCul e Logic",
+                "es": "Varias correcciones en la comunicación para nanoCul y Logic",
+                "pl": "Kilka poprawek w komunikacji dla nanoCul i Logic"
+            },
             "0.5.0": {
                 "en": "Fix Serial data parsing, Admin3 ready",
                 "de": "Repariert Serial Data Parsing, Admin3 bereit",

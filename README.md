@@ -22,6 +22,9 @@ Before using you must first pair the devcies with ioBroker.
 E.g. for thermostats press longer the "boost" button till the countdown will start.
 
 ## Changelog
+### 0.5.1 (2018-03-07)
+* (Apollon77) Further fixes
+
 ### 0.5.0 (2018-02-25)
 * (Apollon77) Fix Serial data parsing
 * (bluefox) Admin3 ready
