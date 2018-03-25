@@ -1,8 +1,19 @@
 {
     "common": {
         "name": "maxcul",
-        "version": "0.5.2",
+        "version": "0.5.3",
         "news": {
+            "0.5.3": {
+                "en": "Optimize logic to send commands and scanning",
+                "de": "Logik zum Senden von Befehlen und zum Scannen optimieren",
+                "ru": "Оптимизация логики для отправки команд и сканирования",
+                "pt": "Otimize a lógica para enviar comandos e digitalizar",
+                "nl": "Optimaliseer logica om opdrachten te verzenden en te scannen",
+                "fr": "Optimiser la logique pour envoyer des commandes et numériser",
+                "it": "Ottimizza la logica per inviare comandi e scansione",
+                "es": "Optimizar la lógica para enviar comandos y escanear",
+                "pl": "Optymalizuj logikę, aby wysyłać polecenia i skanowanie"
+            },
             "0.5.2": {
                 "en": "Several fixes in communication for nanoCul and Logic",
                 "de": "Mehrere Fehler in der Kommunikation für nanoCul und Logic",

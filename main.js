@@ -185,8 +185,8 @@ function sendTemperature(channel) {
 function sendInfo(channel) {
     if (!timers[channel]) return;
 
-    if (credits < 120) {
-        adapter.log.warn('Not enough credits. Wait for more...');
+    if (credits < 220) {
+        adapter.log.warn('Not enough credits(' + credits + '). Wait for more...');
         timers[channel].timer = setTimeout(function () {
             sendInfo(channel);
         }, 5000);
@@ -453,6 +453,7 @@ function setStates(obj) {
         if (state === 'desiredTemperature' && timers[adapter.namespace + '.' + id] && timers[adapter.namespace + '.' + id].requestRunning) {
             adapter.log.debug('Ignore desiredTemperature: ' + val);
             timers[adapter.namespace + '.' + id].desiredTemperature = timers[adapter.namespace + '.' + id].requestRunning;
+            timers[adapter.namespace + '.' + id].requestRunning = false ;
 
             setTimeout(function (channel) {
                 sendInfo(channel);
@@ -1087,6 +1088,10 @@ function pollDevice(id) {
                 if (newVal > 30) newVal = 29.5;
                 var mode   = state.val;
                 timers[id] = timers[id] || {};
+                if (timers[id].requestRunning) {
+                    adapter.log.info('Poll device1 : ' + mode + ', ' + newVal + ' ignored, still running');
+                    return;
+                }
                 timers[id].requestRunning = oldVal;
                 adapter.log.info('Poll device1 : ' + mode + ', ' + newVal);
 

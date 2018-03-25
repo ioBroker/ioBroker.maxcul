@@ -22,6 +22,9 @@ Before using you must first pair the devcies with ioBroker.
 E.g. for thermostats press longer the "boost" button till the countdown will start.
 
 ## Changelog
+### 0.5.3 (2018-03-25)
+* (skraw.iobroker) Optimize logic to send commands and scanning
+
 ### 0.5.1 (2018-03-07)
 * (Apollon77) Further fixes
 
