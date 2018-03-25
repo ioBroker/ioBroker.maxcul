@@ -107,7 +107,7 @@
         "serialport": "",
         "baudrate": 38400,
         "baseAddress": "123456",
-        "scanner": 10
+        "scanner": 0
     },
     "instanceObjects": [
         {
