@@ -519,9 +519,11 @@ function createThermostat(data) {
     //};
 
     // comfortTemperature, ecoTemperature, minimumTemperature, maximumTemperature, offset, windowOpenTime, windowOpenTemperature
-    if (!data.serial && data.raw) {
-        data.serial = hex2a(data.raw.substring(data.raw.length - 20));
-    }
+
+    //Raw nicht verarbeiten, da diese Infor in der normalen Meldung nicht vorhanden ist.
+    //if (!data.serial && data.raw) {
+    //    data.serial = hex2a(data.raw.substring(data.raw.length - 20));
+    //}
 
     if (!data.serial) data.serial = data.src.toUpperCase();
 
@@ -913,9 +915,10 @@ function createButton(data) {
     //    "batteryLow": 100
     //};
 
-    if (!data.serial && data.raw) {
-        data.serial = hex2a(data.raw.substring(data.raw.length - 20));
-    }
+    //Raw nicht verarbeiten, da diese Infor in der normalen Meldung nicht vorhanden ist.
+    //if (!data.serial && data.raw) {
+    //    data.serial = hex2a(data.raw.substring(data.raw.length - 20));
+    //}
 
     if (!data.serial) data.serial = data.src.toUpperCase();
 
@@ -997,9 +1000,10 @@ function createContact(data) {
     //    "batteryLow": 100
     //};
 
-    if (!data.serial && data.raw) {
-        data.serial = hex2a(data.raw.substring(data.raw.length - 20));
-    }
+    //Raw nicht verarbeiten, da diese Infor in der normalen Meldung nicht vorhanden ist.
+    //if (!data.serial && data.raw) {
+    //    data.serial = hex2a(data.raw.substring(data.raw.length - 20));
+    //}
 
     if (!data.serial) data.serial = data.src.toUpperCase();
 
@@ -1007,7 +1011,7 @@ function createContact(data) {
         _id: adapter.namespace + '.' + data.serial,
         common: {
             role: 'indicator',
-            name: 'Push button ' + data.serial
+            name: 'Window Contact' + data.serial
         },
         type: 'channel',
         native: data
@@ -1168,12 +1172,16 @@ function connect() {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
         }
+        data.src = data.src.toUpperCase(); // SRC in Großbuchstaben ändern
+        if (!data.type) data.type = 4; // Data.Type setzen, fehlt wenn schon vorher gepairt war
         adapter.log.debug('ShutterContactStateReceived: ' + JSON.stringify(data));
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
         } else {
             adapter.log.warn('Unknown device: ' + JSON.stringify(data));
-            createButton(data);
+            //IllumNus: kein Button, ShutterContact
+            //createButton(data);
+            createContact(data);
         }
     });
 
@@ -1195,6 +1203,8 @@ function connect() {
             adapter.setState('info.limitOverflow', false, true);
         }
         //ThermostatStateReceived: {"src":"160bd0","mode":1,"desiredTemperature":30.5,"valvePosition":100,"measuredTemperature":22.4,"dstSetting":1,"lanGateway":1,"panel":0,"rfError":0,"batteryLow":0,"untilString":""}
+        data.src = data.src.toUpperCase(); // SRC in Großbuchstaben ändern, da das Device beim Anlegen nur Großbuchstaben bekommt
+        if (!data.type) data.type = 2; // Data.Type setzen, fehlt wenn schon vorher gepairt war
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
         } else {
@@ -1214,6 +1224,10 @@ function connect() {
             adapter.setState('info.limitOverflow', false, true);
         }
         adapter.log.debug('PushButtonStateReceived: ' + JSON.stringify(data));
+
+        data.src = data.src.toUpperCase(); // SRC in Großbuchstaben ändern, da das Device beim Anlegen nur Großbuchstaben bekommt
+        if (!data.type) data.type = 5; // Data.Type setzen, fehlt wenn schon vorher gepairt war
+
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
         } else {
