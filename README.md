@@ -16,6 +16,7 @@ Adapter is derived from [pimatic-maxcul](https://github.com/fbeek/pimatic-maxcul
 - Thermostat
 - Door/window sensor
 - Push button
+- Wallthermostat
 
 ## Usage
 Before using you must first pair the devcies with ioBroker.
