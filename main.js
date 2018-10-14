@@ -503,7 +503,7 @@ function hex2a(hexx) {
     return str;
 }
 
-function createThermostat(data) {
+function createThermostat(data, prefix) {
     //var t = {
     //    "src": "160bd0",
     //    "mode": 1,                   // <==
@@ -519,6 +519,9 @@ function createThermostat(data) {
     //};
 
     // comfortTemperature, ecoTemperature, minimumTemperature, maximumTemperature, offset, windowOpenTime, windowOpenTemperature
+    if(prefix == undefined)
+        prefix = "";
+
     if (!data.serial && data.raw) {
         data.serial = hex2a(data.raw.substring(data.raw.length - 20));
     }
@@ -529,7 +532,7 @@ function createThermostat(data) {
         _id: adapter.namespace + '.' + data.serial,
         common: {
             role: 'thermostat',
-            name: 'Thermostat ' + data.serial
+            name: prefix + 'Thermostat ' + data.serial + " | " + data.src
         },
         type: 'channel',
         native: data
@@ -538,7 +541,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.mode',
         common: {
-            name: 'Thermostat ' + data.serial + ' mode',
+            name: prefix + 'Thermostat ' + data.serial + ' mode',
             type: 'number',
             role: 'level.mode',
             read: true,
@@ -557,7 +560,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.measuredTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' current temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' current temperature',
             type: 'number',
             read: true,
             write: false,
@@ -572,7 +575,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.desiredTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' set temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' set temperature',
             type: 'number',
             read: true,
             write: true,
@@ -589,7 +592,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valvePosition',
         common: {
-            name: 'Thermostat ' + data.serial + ' valve',
+            name: prefix + 'Thermostat ' + data.serial + ' valve',
             type: 'number',
             read: true,
             write: false,
@@ -606,7 +609,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.rfError',
         common: {
-            name: 'Thermostat ' + data.serial + ' error',
+            name: prefix + 'Thermostat ' + data.serial + ' error',
             type: 'boolean',
             read: true,
             write: false,
@@ -620,7 +623,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.batteryLow',
         common: {
-            name: 'Thermostat ' + data.serial + ' low battery',
+            name: prefix + 'Thermostat ' + data.serial + ' low battery',
             type: 'boolean',
             read: true,
             write: false,
@@ -641,7 +644,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.comfortTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' comfort temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' comfort temperature',
             type: 'number',
             read: true,
             write: true,
@@ -658,7 +661,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.ecoTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' eco temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' eco temperature',
             type: 'number',
             read: true,
             write: true,
@@ -675,7 +678,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.minimumTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' minimum temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' minimum temperature',
             type: 'number',
             read: true,
             write: true,
@@ -692,7 +695,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.maximumTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' maximum temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' maximum temperature',
             type: 'number',
             read: true,
             write: true,
@@ -709,7 +712,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.offset',
         common: {
-            name: 'Thermostat ' + data.serial + ' offset temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' offset temperature',
             type: 'number',
             read: true,
             write: true,
@@ -726,7 +729,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.windowOpenTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' window open temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' window open temperature',
             type: 'number',
             read: true,
             write: true,
@@ -743,7 +746,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.windowOpenTime',
         common: {
-            name: 'Thermostat ' + data.serial + ' window open time',
+            name: prefix + 'Thermostat ' + data.serial + ' window open time',
             type: 'number',
             read: true,
             write: true,
@@ -758,7 +761,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.rssi',
         common: {
-            name: 'Thermostat ' + data.serial + ' signal strength',
+            name: prefix + 'Thermostat ' + data.serial + ' signal strength',
             type: 'number',
             read: true,
             write: false,
@@ -773,7 +776,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.boostDuration',
         common: {
-            name: 'Thermostat ' + data.serial + ' boost duration',
+            name: prefix + 'Thermostat ' + data.serial + ' boost duration',
             type: 'number',
             read: true,
             write: true,
@@ -790,7 +793,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.boostValvePosition',
         common: {
-            name: 'Thermostat ' + data.serial + ' boost valve position',
+            name: prefix + 'Thermostat ' + data.serial + ' boost valve position',
             type: 'number',
             read: true,
             write: true,
@@ -807,7 +810,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.decalcificationDay',
         common: {
-            name: 'Thermostat ' + data.serial + ' decalcification week day',
+            name: prefix + 'Thermostat ' + data.serial + ' decalcification week day',
             type: 'number',
             read: true,
             write: true,
@@ -833,7 +836,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.decalcificationHour',
         common: {
-            name: 'Thermostat ' + data.serial + ' decalcification hour',
+            name: prefix + 'Thermostat ' + data.serial + ' decalcification hour',
             type: 'number',
             read: true,
             write: true,
@@ -850,7 +853,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.maxValveSetting',
         common: {
-            name: 'Thermostat ' + data.serial + ' max valve position',
+            name: prefix + 'Thermostat ' + data.serial + ' max valve position',
             type: 'number',
             read: true,
             write: true,
@@ -867,7 +870,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.valveOffset',
         common: {
-            name: 'Thermostat ' + data.serial + ' valve offset',
+            name: prefix + 'Thermostat ' + data.serial + ' valve offset',
             type: 'number',
             read: true,
             write: true,
@@ -885,13 +888,12 @@ function createThermostat(data) {
 }
 
 function createWallThermostat(data) {
-    createThermostat(data);
+    createThermostat(data, "Wall");
 
-    var objs = [obj];
     var obj = {
         _id: adapter.namespace + '.' + data.serial + '.displayConfig.display',
         common: {
-            name:  'Thermostat ' + data.serial + ' display',
+            name:  'WallThermostat ' + data.serial + ' display',
             type:  'boolean',
             desc:  'Display actual temperature',
             role:  'switch',
@@ -901,7 +903,8 @@ function createWallThermostat(data) {
         type:  'state',
         native: data
     };
-    objs.push(obj);
+    var objs = [obj];
+    //objs.push(obj);
     syncObjects(objs);
 }
 
@@ -1185,6 +1188,34 @@ function connect() {
         }
     });
 
+    max.on('WallThermostatStateRecieved', function (data) {
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
+        if (devices[data.src]) {
+            setStates({serial: devices[data.src].native.serial, data: data});
+        } else {
+            adapter.log.warn('Unknown device: ' + JSON.stringify(data));
+            createWallThermostat(data);
+        }
+        adapter.log.debug('WallThermostatStateReceived: ' + JSON.stringify(data));
+    });
+
+    max.on('WallThermostatControlRecieved', function (data){
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
+        if (devices[data.src]) {
+            setStates({serial: devices[data.src].native.serial, data: data});
+        } else {
+            adapter.log.warn('Unknown device: ' + JSON.stringify(data));
+            //createWallThermostat(data);
+        }
+        adapter.log.debug('WallThermostatControlRecieved: ' + JSON.stringify(data));
+    });
+
     max.on('ThermostatStateReceived', function (data) {
         if (!connected) {
             connected = true;
@@ -1275,7 +1306,7 @@ function connect() {
             adapter.setState('info.limitOverflow', false, true);
         }
         adapter.log.info('PairDevice: ' + JSON.stringify(data));
-        if (data.type === 1 || data.type === 2 || data.type === 3) {
+        if (data.type === 1 || data.type === 2 /*|| data.type === 3*/) {
             createThermostat(data);
         } else if (data.type === 3) {
             createWallThermostat(data);
