@@ -16,12 +16,16 @@ Adapter is derived from [pimatic-maxcul](https://github.com/fbeek/pimatic-maxcul
 - Thermostat
 - Door/window sensor
 - Push button
+- Wallthermostat
 
 ## Usage
 Before using you must first pair the devcies with ioBroker.
 E.g. for thermostats press longer the "boost" button till the countdown will start.
 
 ## Changelog
+### 1.0.0 (2018-10-20)
+* (Arne Stenmannsr) Wall thermostat was added
+
 ### 0.5.3 (2018-03-25)
 * (skraw.iobroker) Optimize logic to send commands and scanning
 

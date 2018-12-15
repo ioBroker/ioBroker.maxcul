@@ -1,8 +1,19 @@
 {
     "common": {
         "name": "maxcul",
-        "version": "0.5.3",
+        "version": "1.0.0",
         "news": {
+            "1.0.0": {
+                "en": "Wall thermostat was added",
+                "de": "Wandthermostat wurde hinzugefügt",
+                "ru": "Настенный термостат был добавлен",
+                "pt": "Termostato de parede foi adicionado",
+                "nl": "Wandthermostaat is toegevoegd",
+                "fr": "Le thermostat mural a été ajouté",
+                "it": "È stato aggiunto il termostato a parete",
+                "es": "Se agregó termostato de pared",
+                "pl": "Dodano termostat ścienny"
+            },
             "0.5.3": {
                 "en": "Optimize logic to send commands and scanning",
                 "de": "Logik zum Senden von Befehlen und zum Scannen optimieren",

@@ -3,19 +3,18 @@
 
 'use strict';
 // you have to require the utils module and call adapter function
-var utils = require(__dirname + '/lib/utils'); // Get common adapter utils
+const utils = require(__dirname + '/lib/utils'); // Get common adapter utils
 
-var max;
-var objects = {};
-var SerialPort;
-var Readline;
-var devices = {};
-var timers = {};
-var limitOverflow = null;
-var credits = 0;
-var connected = false;
-var creditsTimer;
-var thermostatTimer;
+let max;
+const objects = {};
+let SerialPort;
+const devices = {};
+const timers = {};
+let limitOverflow = null;
+let credits = 0;
+let connected = false;
+let creditsTimer;
+let thermostatTimer;
 
 try {
     SerialPort = require('serialport');
@@ -23,10 +22,9 @@ try {
     console.error('Cannot load serialport module');
 }
 
+const adapter = utils.Adapter('maxcul');
 
-var adapter = utils.Adapter('maxcul');
-
-adapter.on('stateChange', function (id, state) {
+adapter.on('stateChange', (id, state) => {
     if (!id || !state || state.ack) return;
     if (!objects[id] || !objects[id].native) {
         adapter.log.warn('Unknown ID: ' + id);
@@ -36,9 +34,9 @@ adapter.on('stateChange', function (id, state) {
         adapter.log.warn('id "' + id + '" is readonly');
         return;
     }
-    var channel = id.split('.');
-    var name = channel.pop();
-    var type = channel[channel.length - 1];
+    let channel = id.split('.');
+    const name = channel.pop();
+    const type = channel[channel.length - 1];
     if (type === 'config' ||
         type === 'displayConfig' ||
         type === 'valveConfig') channel.pop();
@@ -57,13 +55,11 @@ adapter.on('stateChange', function (id, state) {
 
         timers[channel] = timers[channel] || {};
         timers[channel][name] = state.val;
-        timers[channel].timer = setTimeout(function (ch) {
-            sendInfo(ch);
-        }, 1000, channel);
+        timers[channel].timer = setTimeout(ch => sendInfo(ch), 1000, channel);
     }
 });
 
-adapter.on('unload', function (callback) {
+adapter.on('unload', callback => {
     if (adapter && adapter.setState) adapter.setState('info.connection', false, true);
     if (max) max.disconnect();
     callback();
@@ -71,14 +67,14 @@ adapter.on('unload', function (callback) {
 
 adapter.on('ready', main);
 
-adapter.on('message', function (obj) {
+adapter.on('message', obj => {
     if (obj) {
         switch (obj.command) {
             case 'listUart':
                 if (obj.callback) {
                     if (SerialPort) {
                         // read all found serial ports
-                        SerialPort.list(function (err, ports) {
+                        SerialPort.list((err, ports) => {
                             adapter.log.info('List of port: ' + JSON.stringify(ports));
                             adapter.sendTo(obj.from, obj.command, ports, obj.callback);
                         });
@@ -98,19 +94,19 @@ function checkPort(callback) {
         if (callback) callback('Port is not selected');
         return;
     }
-    var sPort;
+    let sPort;
     try {
         sPort = new SerialPort(adapter.config.serialport || '/dev/ttyACM0', {
             baudRate: parseInt(adapter.config.baudrate, 10) || 9600,
             autoOpen: false
         });
-        sPort.on('error', function (err) {
+        sPort.on('error', err => {
             if (sPort.isOpen()) sPort.close();
             if (callback) callback(err);
             callback = null;
         });
 
-        sPort.open(function (err) {
+        sPort.open(err => {
             if (sPort.isOpen()) sPort.close();
 
             if (callback) callback(err);
@@ -187,9 +183,7 @@ function sendInfo(channel) {
 
     if (credits < 220) {
         adapter.log.warn('Not enough credits(' + credits + '). Wait for more...');
-        timers[channel].timer = setTimeout(function () {
-            sendInfo(channel);
-        }, 5000);
+        timers[channel].timer = setTimeout(() => sendInfo(channel), 5000);
         return;
     }
 
@@ -198,10 +192,10 @@ function sendInfo(channel) {
     if (timers[channel].mode !== undefined || timers[channel].desiredTemperature !== undefined) {
         timers[channel].requestRunning = false;
 
-        var count1 = 0;
+        let count1 = 0;
         if (timers[channel].mode === undefined) {
             count1++;
-            adapter.getForeignState(channel + '.mode', function (err, state) {
+            adapter.getForeignState(channel + '.mode', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 0;
@@ -212,7 +206,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].desiredTemperature === undefined) {
             count1++;
-            adapter.getForeignState(channel + '.desiredTemperature', function (err, state) {
+            adapter.getForeignState(channel + '.desiredTemperature', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 21;
@@ -231,10 +225,10 @@ function sendInfo(channel) {
         timers[channel].offset                  !== undefined ||
         timers[channel].windowOpenTime          !== undefined ||
         timers[channel].windowOpenTemperature   !== undefined) {
-        var count2 = 0;
+        let count2 = 0;
         if (timers[channel].comfortTemperature === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.config.comfortTemperature', function (err, state) {
+            adapter.getForeignState(channel + '.config.comfortTemperature', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 21;
@@ -245,7 +239,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].ecoTemperature === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.config.ecoTemperature', function (err, state) {
+            adapter.getForeignState(channel + '.config.ecoTemperature', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 17;
@@ -256,7 +250,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].minimumTemperature === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.config.minimumTemperature', function (err, state) {
+            adapter.getForeignState(channel + '.config.minimumTemperature', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 4.5;
@@ -267,7 +261,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].maximumTemperature === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.config.maximumTemperature', function (err, state) {
+            adapter.getForeignState(channel + '.config.maximumTemperature', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 30.5;
@@ -278,7 +272,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].offset === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.config.offset', function (err, state) {
+            adapter.getForeignState(channel + '.config.offset', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 0;
@@ -289,7 +283,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].windowOpenTime === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.config.windowOpenTime', function (err, state) {
+            adapter.getForeignState(channel + '.config.windowOpenTime', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 10;
@@ -300,7 +294,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].windowOpenTemperature === undefined) {
             count2++;
-            adapter.getForeignState(channel + '.config.windowOpenTemperature', function (err, state) {
+            adapter.getForeignState(channel + '.config.windowOpenTemperature', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 12;
@@ -320,10 +314,10 @@ function sendInfo(channel) {
         timers[channel].maxValveSetting       !== undefined ||
         timers[channel].valveOffset           !== undefined) {
 
-        var count3 = 0;
+        let count3 = 0;
         if (timers[channel].boostDuration === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.valveConfig.boostDuration', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.boostDuration', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 5;
@@ -334,7 +328,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].boostValvePosition === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.valveConfig.boostValvePosition', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.boostValvePosition', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 100;
@@ -345,7 +339,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].decalcificationDay === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.valveConfig.decalcificationDay', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.decalcificationDay', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 0;
@@ -356,7 +350,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].decalcificationHour === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.valveConfig.decalcificationHour', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.decalcificationHour', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 12;
@@ -367,7 +361,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].maxValveSetting === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.valveConfig.maxValveSetting', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.maxValveSetting', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 100;
@@ -378,7 +372,7 @@ function sendInfo(channel) {
         }
         if (timers[channel].valveOffset === undefined) {
             count3++;
-            adapter.getForeignState(channel + '.valveConfig.valveOffset', function (err, state) {
+            adapter.getForeignState(channel + '.valveConfig.valveOffset', (err, state) => {
                 if (!state || state.val === null || state.val === undefined) {
                     state = state || {};
                     state.val = 0;
@@ -391,25 +385,23 @@ function sendInfo(channel) {
     }
 }
 
-var tasks = [];
+const tasks = [];
 
 function processTasks() {
     if (tasks.length) {
-        var task = tasks.shift();
+        const task = tasks.shift();
         if (task.type === 'state') {
-            adapter.setForeignState(task.id, task.val, true, function () {
-                setTimeout(processTasks, 0);
-            });
+            adapter.setForeignState(task.id, task.val, true, () => setTimeout(processTasks, 0));
         } else if (task.type === 'object') {
-            adapter.getForeignObject(task.id, function (err, obj) {
+            adapter.getForeignObject(task.id, (err, obj) => {
                 if (!obj) {
                     objects[task.id] = task.obj;
-                    adapter.setForeignObject(task.id, task.obj, function (err, res) {
+                    adapter.setForeignObject(task.id, task.obj, (err, res) => {
                         adapter.log.info('object ' + adapter.namespace + '.' + task.id + ' created');
                         setTimeout(processTasks, 0);
                     });
                 } else {
-                    var changed = false;
+                    let changed = false;
                     if (JSON.stringify(obj.native) !== JSON.stringify(task.obj.native)) {
                         obj.native = task.obj.native;
                         changed = true;
@@ -417,7 +409,7 @@ function processTasks() {
 
                     if (changed) {
                         objects[obj._id] = obj;
-                        adapter.setForeignObject(obj._id, obj, function (err, res) {
+                        adapter.setForeignObject(obj._id, obj, (err, res) => {
                             adapter.log.info('object ' + adapter.namespace + '.' + obj._id + ' created');
                             setTimeout(processTasks, 0);
                         });
@@ -434,30 +426,28 @@ function processTasks() {
 }
 
 function setStates(obj) {
-    var id = obj.serial;
-    var isStart = !tasks.length;
+    const id = obj.serial;
+    const isStart = !tasks.length;
     if (!devices[obj.data.src]) return;
 
     devices[obj.data.src].lastReceived = new Date().getTime();
 
-    for (var state in obj.data) {
+    for (const state in obj.data) {
         if (!obj.data.hasOwnProperty(state)) continue;
         if (state === 'src') continue;
         if (state === 'serial') continue;
         if (obj.data[state] === undefined) continue;
 
-        var oid  = adapter.namespace + '.' + id + '.' + state;
-        var meta = objects[oid];
-        var val  = obj.data[state];
+        const oid  = adapter.namespace + '.' + id + '.' + state;
+        const meta = objects[oid];
+        let val  = obj.data[state];
 
         if (state === 'desiredTemperature' && timers[adapter.namespace + '.' + id] && timers[adapter.namespace + '.' + id].requestRunning) {
             adapter.log.debug('Ignore desiredTemperature: ' + val);
             timers[adapter.namespace + '.' + id].desiredTemperature = timers[adapter.namespace + '.' + id].requestRunning;
             timers[adapter.namespace + '.' + id].requestRunning = false ;
 
-            setTimeout(function (channel) {
-                sendInfo(channel);
-            }, 0, adapter.namespace + '.' + id);
+            setTimeout(channel => sendInfo(channel), 0, adapter.namespace + '.' + id);
             continue;
         }
 
@@ -478,8 +468,8 @@ function setStates(obj) {
 }
 
 function syncObjects(objs) {
-    var isStart = !tasks.length;
-    for (var i = 0; i < objs.length; i++) {
+    const isStart = !tasks.length;
+    for (let i = 0; i < objs.length; i++) {
         if (objs[i].native && objs[i].native.type && !devices[objs[i].native.src]) {
             devices[objs[i].native.src] = objs[i];
         }
@@ -489,10 +479,10 @@ function syncObjects(objs) {
 }
 
 function hex2a(hexx) {
-    var hex = hexx.toString();//force conversion
-    var str = '';
-    for (var i = 0; i < hex.length; i += 2) {
-        var s = String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    const hex = hexx.toString();//force conversion
+    let str = '';
+    for (let i = 0; i < hex.length; i += 2) {
+        const s = String.fromCharCode(parseInt(hex.substr(i, 2), 16));
         // serial is ABC1324555
         if ((s >= 'A' && s <= 'Z') || (s >= 'a' && s <= 'z') || (s >= '0' && s <= '9')) {
             str += s;
@@ -503,8 +493,8 @@ function hex2a(hexx) {
     return str;
 }
 
-function createThermostat(data) {
-    //var t = {
+function createThermostat(data, prefix) {
+    //const t = {
     //    "src": "160bd0",
     //    "mode": 1,                   // <==
     //    "desiredTemperature": 30.5,  // <==
@@ -519,28 +509,30 @@ function createThermostat(data) {
     //};
 
     // comfortTemperature, ecoTemperature, minimumTemperature, maximumTemperature, offset, windowOpenTime, windowOpenTemperature
+    prefix = prefix || '';
 
-    //Raw nicht verarbeiten, da diese Infor in der normalen Meldung nicht vorhanden ist.
-    //if (!data.serial && data.raw) {
-    //    data.serial = hex2a(data.raw.substring(data.raw.length - 20));
-    //}
+    if (!data.serial && data.raw) {
+        data.serial = hex2a(data.raw.substring(data.raw.length - 20));
+    }
 
-    if (!data.serial) data.serial = data.src.toUpperCase();
+    if (!data.serial) {
+        data.serial = data.src.toUpperCase();
+    }
 
-    var obj = {
+    let obj = {
         _id: adapter.namespace + '.' + data.serial,
         common: {
             role: 'thermostat',
-            name: 'Thermostat ' + data.serial
+            name: prefix + 'Thermostat ' + data.serial + ' | ' + data.src
         },
         type: 'channel',
         native: data
     };
-    var objs = [obj];
+    const objs = [obj];
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.mode',
         common: {
-            name: 'Thermostat ' + data.serial + ' mode',
+            name: prefix + 'Thermostat ' + data.serial + ' mode',
             type: 'number',
             role: 'level.mode',
             read: true,
@@ -559,7 +551,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.measuredTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' current temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' current temperature',
             type: 'number',
             read: true,
             write: false,
@@ -574,7 +566,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.desiredTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' set temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' set temperature',
             type: 'number',
             read: true,
             write: true,
@@ -591,7 +583,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valvePosition',
         common: {
-            name: 'Thermostat ' + data.serial + ' valve',
+            name: prefix + 'Thermostat ' + data.serial + ' valve',
             type: 'number',
             read: true,
             write: false,
@@ -608,7 +600,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.rfError',
         common: {
-            name: 'Thermostat ' + data.serial + ' error',
+            name: prefix + 'Thermostat ' + data.serial + ' error',
             type: 'boolean',
             read: true,
             write: false,
@@ -622,7 +614,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.batteryLow',
         common: {
-            name: 'Thermostat ' + data.serial + ' low battery',
+            name: prefix + 'Thermostat ' + data.serial + ' low battery',
             type: 'boolean',
             read: true,
             write: false,
@@ -643,7 +635,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.comfortTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' comfort temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' comfort temperature',
             type: 'number',
             read: true,
             write: true,
@@ -660,7 +652,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.ecoTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' eco temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' eco temperature',
             type: 'number',
             read: true,
             write: true,
@@ -677,7 +669,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.minimumTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' minimum temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' minimum temperature',
             type: 'number',
             read: true,
             write: true,
@@ -694,7 +686,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.maximumTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' maximum temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' maximum temperature',
             type: 'number',
             read: true,
             write: true,
@@ -711,7 +703,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.offset',
         common: {
-            name: 'Thermostat ' + data.serial + ' offset temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' offset temperature',
             type: 'number',
             read: true,
             write: true,
@@ -728,7 +720,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.windowOpenTemperature',
         common: {
-            name: 'Thermostat ' + data.serial + ' window open temperature',
+            name: prefix + 'Thermostat ' + data.serial + ' window open temperature',
             type: 'number',
             read: true,
             write: true,
@@ -745,7 +737,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.config.windowOpenTime',
         common: {
-            name: 'Thermostat ' + data.serial + ' window open time',
+            name: prefix + 'Thermostat ' + data.serial + ' window open time',
             type: 'number',
             read: true,
             write: true,
@@ -760,7 +752,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.rssi',
         common: {
-            name: 'Thermostat ' + data.serial + ' signal strength',
+            name: prefix + 'Thermostat ' + data.serial + ' signal strength',
             type: 'number',
             read: true,
             write: false,
@@ -775,7 +767,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.boostDuration',
         common: {
-            name: 'Thermostat ' + data.serial + ' boost duration',
+            name: prefix + 'Thermostat ' + data.serial + ' boost duration',
             type: 'number',
             read: true,
             write: true,
@@ -792,7 +784,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.boostValvePosition',
         common: {
-            name: 'Thermostat ' + data.serial + ' boost valve position',
+            name: prefix + 'Thermostat ' + data.serial + ' boost valve position',
             type: 'number',
             read: true,
             write: true,
@@ -809,7 +801,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.decalcificationDay',
         common: {
-            name: 'Thermostat ' + data.serial + ' decalcification week day',
+            name: prefix + 'Thermostat ' + data.serial + ' decalcification week day',
             type: 'number',
             read: true,
             write: true,
@@ -835,7 +827,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.decalcificationHour',
         common: {
-            name: 'Thermostat ' + data.serial + ' decalcification hour',
+            name: prefix + 'Thermostat ' + data.serial + ' decalcification hour',
             type: 'number',
             read: true,
             write: true,
@@ -852,7 +844,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.maxValveSetting',
         common: {
-            name: 'Thermostat ' + data.serial + ' max valve position',
+            name: prefix + 'Thermostat ' + data.serial + ' max valve position',
             type: 'number',
             read: true,
             write: true,
@@ -869,7 +861,7 @@ function createThermostat(data) {
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.valveConfig.valveOffset',
         common: {
-            name: 'Thermostat ' + data.serial + ' valve offset',
+            name: prefix + 'Thermostat ' + data.serial + ' valve offset',
             type: 'number',
             read: true,
             write: true,
@@ -887,13 +879,12 @@ function createThermostat(data) {
 }
 
 function createWallThermostat(data) {
-    createThermostat(data);
+    createThermostat(data, 'Wall');
 
-    var objs = [obj];
-    var obj = {
+    const obj = {
         _id: adapter.namespace + '.' + data.serial + '.displayConfig.display',
         common: {
-            name:  'Thermostat ' + data.serial + ' display',
+            name:  'WallThermostat ' + data.serial + ' display',
             type:  'boolean',
             desc:  'Display actual temperature',
             role:  'switch',
@@ -903,12 +894,11 @@ function createWallThermostat(data) {
         type:  'state',
         native: data
     };
-    objs.push(obj);
-    syncObjects(objs);
+    syncObjects([obj]);
 }
 
 function createButton(data) {
-    //var t = {
+    //const t = {
     //    "src": "160bd0",
     //    "isOpen": 1,                   // <==
     //    "rfError": 30.5,  // <==
@@ -922,7 +912,7 @@ function createButton(data) {
 
     if (!data.serial) data.serial = data.src.toUpperCase();
 
-    var obj = {
+    let obj = {
         _id: adapter.namespace + '.' + data.serial,
         common: {
             role: 'button',
@@ -931,7 +921,7 @@ function createButton(data) {
         type: 'channel',
         native: data
     };
-    var objs = [obj];
+    const objs = [obj];
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.pressed',
         common: {
@@ -993,7 +983,7 @@ function createButton(data) {
 }
 
 function createContact(data) {
-    //var t = {
+    //const t = {
     //    "src": "160bd0",
     //    "isOpen": 1,                   // <==
     //    "rfError": 30.5,  // <==
@@ -1007,7 +997,7 @@ function createContact(data) {
 
     if (!data.serial) data.serial = data.src.toUpperCase();
 
-    var obj = {
+    let obj = {
         _id: adapter.namespace + '.' + data.serial,
         common: {
             role: 'indicator',
@@ -1016,7 +1006,7 @@ function createContact(data) {
         type: 'channel',
         native: data
     };
-    var objs = [obj];
+    const objs = [obj];
     obj = {
         _id: adapter.namespace + '.' + data.serial + '.isOpen',
         common: {
@@ -1078,19 +1068,19 @@ function createContact(data) {
 }
 
 function pollDevice(id) {
-    var src = objects[id].native.src;
+    const src = objects[id].native.src;
     if (credits < 400 || !devices[src]) {
         return;
     }
     devices[src].lastReceived = new Date().getTime();
-    adapter.getForeignState(id + '.mode', function (err, state) {
-        adapter.getForeignState(id + '.desiredTemperature', function (err, stateTemp) {
+    adapter.getForeignState(id + '.mode', (err, state) => {
+        adapter.getForeignState(id + '.desiredTemperature', (err, stateTemp) => {
             if (state && state.val !== null && state.val !== undefined) {
-                var newVal = stateTemp.val;
-                var oldVal = stateTemp.val;
+                let newVal = stateTemp.val;
+                const oldVal = stateTemp.val;
                 newVal = newVal + 0.5;
                 if (newVal > 30) newVal = 29.5;
-                var mode   = state.val;
+                const mode   = state.val;
                 timers[id] = timers[id] || {};
                 if (timers[id].requestRunning) {
                     adapter.log.info('Poll device1 : ' + mode + ', ' + newVal + ' ignored, still running');
@@ -1117,23 +1107,21 @@ function connect() {
         return;
     }
 
-    var env = {
+    const env = {
         logger: adapter.log
     };
 
-    var Max = require(__dirname + '/lib/maxcul')(env);
+    const Max = require(__dirname + '/lib/maxcul')(env);
 
     max = new Max(adapter.config.baseAddress, true, adapter.config.serialport, parseInt(adapter.config.baudrate, 10) || 9600);
 
-    creditsTimer = setInterval(function () {
-        max.getCredits();
-    }, 5000);
+    creditsTimer = setInterval(() => max.getCredits(), 5000);
 
     if (adapter.config.scanner) {
-        thermostatTimer = setInterval(function () {
-            var now = new Date().getTime();
-            for (var id in objects) {
-                if (objects[id].type === 'channel' && (objects[id].native.type === 1 || objects[id].native.type === 2 || objects[id].native.type === 3)) {
+        thermostatTimer = setInterval(() => {
+            const now = new Date().getTime();
+            for (const id in objects) {
+                if (objects.hasOwnProperty(id) && objects[id].type === 'channel' && (objects[id].native.type === 1 || objects[id].native.type === 2 || objects[id].native.type === 3)) {
                     if (devices[objects[id].native.src] && (!devices[objects[id].native.src].lastReceived || now - devices[objects[id].native.src].lastReceived > adapter.config.scanner * 60000)) {
                         pollDevice(id);
                     }
@@ -1142,7 +1130,7 @@ function connect() {
         }, 60000);
     }
 
-    max.on('creditsReceived', function (credit, credit1) {
+    max.on('creditsReceived', (credit, credit1) => {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1163,7 +1151,7 @@ function connect() {
         adapter.setState('info.quota', credits, true);
     });
 
-    max.on('ShutterContactStateReceived', function (data) {
+    max.on('ShutterContactStateReceived', data => {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1185,7 +1173,7 @@ function connect() {
         }
     });
 
-    max.on('culFirmwareVersion', function (data) {
+    max.on('culFirmwareVersion', data => {
         adapter.setState('info.version', data, true);
         if (!connected) {
             connected = true;
@@ -1193,7 +1181,35 @@ function connect() {
         }
     });
 
-    max.on('ThermostatStateReceived', function (data) {
+    max.on('WallThermostatStateRecieved', data => {
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
+        if (devices[data.src]) {
+            setStates({serial: devices[data.src].native.serial, data: data});
+        } else {
+            adapter.log.warn('Unknown device: ' + JSON.stringify(data));
+            createWallThermostat(data);
+        }
+        adapter.log.debug('WallThermostatStateReceived: ' + JSON.stringify(data));
+    });
+
+    max.on('WallThermostatControlRecieved', data => {
+        if (!connected) {
+            connected = true;
+            adapter.setState('info.connection', true, true);
+        }
+        if (devices[data.src]) {
+            setStates({serial: devices[data.src].native.serial, data: data});
+        } else {
+            adapter.log.warn('Unknown device: ' + JSON.stringify(data));
+            //createWallThermostat(data);
+        }
+        adapter.log.debug('WallThermostatControlRecieved: ' + JSON.stringify(data));
+    });
+
+    max.on('ThermostatStateReceived', data => {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1214,7 +1230,7 @@ function connect() {
         adapter.log.debug('ThermostatStateReceived: ' + JSON.stringify(data));
     });
 
-    max.on('PushButtonStateReceived', function (data) {
+    max.on('PushButtonStateReceived', data => {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1236,7 +1252,7 @@ function connect() {
         }
     });
 
-    max.on('checkTimeIntervalFired', function () {
+    max.on('checkTimeIntervalFired', () => {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1247,11 +1263,11 @@ function connect() {
         }
 
         adapter.log.info('checkTimeIntervalFired');
-        adapter.log.debug("Updating time information for deviceId");
+        adapter.log.debug('Updating time information for deviceId');
         max.sendTimeInformation(adapter.config.baseAddress);
     });
 
-    max.on('deviceRequestTimeInformation', function (src) {
+    max.on('deviceRequestTimeInformation', src => {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1261,13 +1277,13 @@ function connect() {
             adapter.setState('info.limitOverflow', false, true);
         }
         adapter.log.info('deviceRequestTimeInformation: ' + JSON.stringify(src));
-        adapter.log.debug("Updating time information for deviceId " + src);
+        adapter.log.debug('Updating time information for deviceId ' + src);
         if (devices[src]) {
             max.sendTimeInformation(src, devices[src].native.type);
         }
     });
 
-    max.on('LOVF', function () {
+    max.on('LOVF', () => {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1279,7 +1295,7 @@ function connect() {
         }
     });
 
-    max.on('PairDevice', function (data) {
+    max.on('PairDevice', data => {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1289,7 +1305,7 @@ function connect() {
             adapter.setState('info.limitOverflow', false, true);
         }
         adapter.log.info('PairDevice: ' + JSON.stringify(data));
-        if (data.type === 1 || data.type === 2 || data.type === 3) {
+        if (data.type === 1 || data.type === 2 /*|| data.type === 3*/) {
             createThermostat(data);
         } else if (data.type === 3) {
             createWallThermostat(data);
@@ -1305,7 +1321,7 @@ function connect() {
     if (adapter.config.serialport && adapter.config.serialport !== 'DEBUG') {
         max.connect();
     } else if (adapter.config.serialport === 'DEBUG') {
-        setTimeout(function () {
+        setTimeout(() => {
             max.emit('PairDevice', {
                 src: '160bd0',
                 type: 1,
@@ -1313,7 +1329,7 @@ function connect() {
             });
         }, 100);
 
-        setTimeout(function () {
+        setTimeout(() => {
             max.emit('ThermostatStateReceived', {
                 src: '160bd0',
                 mode: 1,
@@ -1330,7 +1346,7 @@ function connect() {
             });
         }, 1200);
 
-        setTimeout(function () {
+        setTimeout(() => {
             max.emit('PairDevice', {
                 src: '160bd1',
                 type: 5,
@@ -1338,7 +1354,7 @@ function connect() {
             });
         }, 300);
 
-        setTimeout(function () {
+        setTimeout(() => {
             max.emit('PushButtonStateReceived', {
                 src: '160bd1',
                 pressed: 1,
@@ -1348,7 +1364,7 @@ function connect() {
             });
         }, 1400);
 
-        setTimeout(function () {
+        setTimeout(() => {
             max.emit('PairDevice', {
                 src: '160bd2',
                 type: 4,
@@ -1356,7 +1372,7 @@ function connect() {
             });
         }, 300);
 
-        setTimeout(function () {
+        setTimeout(() => {
             max.emit('ShutterContactStateReceived', {
                 src: '160bd2',
                 isOpen: 0,
@@ -1371,15 +1387,17 @@ function connect() {
 }
 
 function main() {
-    if (adapter.config.scanner === undefined) adapter.config.scanner = 10;
+    if (adapter.config.scanner === undefined) {
+        adapter.config.scanner = 10;
+    }
     adapter.config.scanner = parseInt(adapter.config.scanner, 10) || 0;
 
-    adapter.objects.getObjectView('system', 'channel', {startkey: adapter.namespace + '.', endkey: adapter.namespace + '.\u9999'}, function (err, res) {
-        for (var i = 0, l = res.rows.length; i < l; i++) {
+    adapter.objects.getObjectView('system', 'channel', {startkey: adapter.namespace + '.', endkey: adapter.namespace + '.\u9999'}, (err, res) => {
+        for (let i = 0, l = res.rows.length; i < l; i++) {
             objects[res.rows[i].id] = res.rows[i].value;
         }
-        adapter.objects.getObjectView('system', 'state', {startkey: adapter.namespace + '.', endkey: adapter.namespace + '.\u9999'}, function (err, res) {
-            for (var i = 0, l = res.rows.length; i < l; i++) {
+        adapter.objects.getObjectView('system', 'state', {startkey: adapter.namespace + '.', endkey: adapter.namespace + '.\u9999'}, (err, res) => {
+            for (let i = 0, l = res.rows.length; i < l; i++) {
                 objects[res.rows[i].id] = res.rows[i].value;
                 if (objects[res.rows[i].id].native && objects[res.rows[i].id].native.src) {
                     devices[objects[res.rows[i].id].native.src] = objects[res.rows[i].id];

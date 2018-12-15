@@ -5,7 +5,7 @@
     "email": "dogafox@gmail.com"
   },
   "description": "Javascript/Node.js based Busware CUL USB / culfw adapter",
-  "version": "0.5.3",
+  "version": "1.0.0",
   "bugs": {
     "url": "https://github.com/ioBroker/ioBroker.maxcul/issues"
   },
@@ -16,7 +16,7 @@
     }
   ],
   "dependencies": {
-    "moment": "^2.20.1",
+    "moment": "^2.22.2",
     "bluebird": "^3.5.1",
     "serialport": "^4.0.7",
     "bitset": "^4.1.0",
@@ -24,9 +24,9 @@
     "sprintf-js": "^1.1.1"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
+    "chai": "^4.2.0",
     "gulp": "^3.9.1",
-    "mocha": "^5.0.1"
+    "mocha": "^5.2.0"
   },
   "directories": {},
   "homepage": "https://github.com/ioBroker/ioBroker.maxcul",
