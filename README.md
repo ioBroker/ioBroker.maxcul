@@ -1,7 +1,7 @@
 ![Logo](admin/maxcul.png)
 # ioBroker.maxcul
 ==================================
-[![NPM version](http://img.shields.io/npm/v/iobroker.maxcul.svg)](https://www.npmjs.com/package/iobroker.maxcul)
+![Number of Installations](http://iobroker.live/badges/maxcul-installed.svg) ![Number of Installations](http://iobroker.live/badges/maxcul-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.maxcul.svg)](https://www.npmjs.com/package/iobroker.maxcul)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.maxcul.svg)](https://www.npmjs.com/package/iobroker.maxcul)
 [![Tests](https://travis-ci.org/ioBroker/ioBroker.maxcul.svg?branch=master)](https://travis-ci.org/ioBroker/ioBroker.maxcul)
 
