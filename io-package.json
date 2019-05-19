@@ -1,8 +1,67 @@
 {
     "common": {
-        "name":                     "maxcul",
-        "version": "0.2.3",
+        "name": "maxcul",
+        "version": "1.0.0",
         "news": {
+            "1.0.0": {
+                "en": "Wall thermostat was added",
+                "de": "Wandthermostat wurde hinzugefügt",
+                "ru": "Настенный термостат был добавлен",
+                "pt": "Termostato de parede foi adicionado",
+                "nl": "Wandthermostaat is toegevoegd",
+                "fr": "Le thermostat mural a été ajouté",
+                "it": "È stato aggiunto il termostato a parete",
+                "es": "Se agregó termostato de pared",
+                "pl": "Dodano termostat ścienny"
+            },
+            "0.5.3": {
+                "en": "Optimize logic to send commands and scanning",
+                "de": "Logik zum Senden von Befehlen und zum Scannen optimieren",
+                "ru": "Оптимизация логики для отправки команд и сканирования",
+                "pt": "Otimize a lógica para enviar comandos e digitalizar",
+                "nl": "Optimaliseer logica om opdrachten te verzenden en te scannen",
+                "fr": "Optimiser la logique pour envoyer des commandes et numériser",
+                "it": "Ottimizza la logica per inviare comandi e scansione",
+                "es": "Optimizar la lógica para enviar comandos y escanear",
+                "pl": "Optymalizuj logikę, aby wysyłać polecenia i skanowanie"
+            },
+            "0.5.2": {
+                "en": "Several fixes in communication for nanoCul and Logic",
+                "de": "Mehrere Fehler in der Kommunikation für nanoCul und Logic",
+                "ru": "Несколько исправлений в общении для nanoCul и Logic",
+                "pt": "Várias correcções na comunicação para nanoCul e Logic",
+                "nl": "Verschillende oplossingen voor communicatie voor nanoCul en Logic",
+                "fr": "Plusieurs correctifs dans la communication pour nanoCul et Logic",
+                "it": "Diverse correzioni nella comunicazione per nanoCul e Logic",
+                "es": "Varias correcciones en la comunicación para nanoCul y Logic",
+                "pl": "Kilka poprawek w komunikacji dla nanoCul i Logic"
+            },
+            "0.5.0": {
+                "en": "Fix Serial data parsing, Admin3 ready",
+                "de": "Repariert Serial Data Parsing, Admin3 bereit",
+                "ru": "Исправить синтаксический анализ последовательных данных, готовность Admin3",
+                "pt": "Fixar análise de dados em série, Admin3 pronto",
+                "nl": "Lossen van seriële gegevens op, Admin3 gereed",
+                "fr": "Correction de l'analyse des données en série, Admin3 prêt",
+                "it": "Correzione dell'analisi dei dati seriali, pronto per Admin3",
+                "es": "Repara el análisis de datos en serie, listo para Admin3",
+                "pl": "Naprawiono szeregowe przetwarzanie danych, gotowe Admin3"
+            },
+            "0.4.1": {
+                "en": "Upgrade dependencies",
+                "de": "Abhängigkeiten aktualisiert",
+                "ru": "Upgrade dependencies"
+            },
+            "0.4.0": {
+                "en": "Upgrade Serialport and cul library",
+                "de": "Serialport und cul Bibliotheken aktualisiert",
+                "ru": "Upgrade Serialport and cul library"
+            },
+            "0.3.0": {
+                "en": "Fix control of thermostates",
+                "de": "Korrigiere die Steuerung von Thermostaten",
+                "ru": "Исправлено управление термостатами"
+            },
             "0.2.3": {
                 "en": "Fix calculation of serial number\nAdd valve configuration",
                 "de": "Korrigiere die Berechnung von Serialnummer\nVentilkonfiguration hinzugefügt",
@@ -19,38 +78,51 @@
                 "ru": "intial commit"
             }
         },
-        "titleLang": {
-            "en": "max! CUL",
-            "de": "max! CUL",
-            "ru": "max! CUL"
-        },
-        "title":                    "max! CUL",
-        "desc":                     {
+        "title": "max! CUL",
+        "desc": {
             "en": "Control max! devices over CUL stick",
             "de": "Steuere max! Geräte mit CUL stick",
-            "ru": "Управляет устройствами max! при помощи CUL"
+            "ru": "Управляет устройствами max! при помощи CUL",
+            "pt": "Controle máximo! dispositivos sobre o stick CUL",
+            "nl": "Controle max! apparaten boven CUL-stick",
+            "fr": "Contrôle max! appareils sur bâton CUL",
+            "it": "Controllo max! dispositivi su CUL stick",
+            "es": "Control max! dispositivos sobre CUL stick",
+            "pl": "Kontrola max! urządzenia na sztyfcie CUL"
         },
-        "platform":                 "javascript/Node.js",
-        "mode":                     "daemon",
-        "loglevel":                 "info",
-        "license":                  "GPL-2.0",
-        "enabled":                  true,
-        "messagebox":               true,
-        "icon":                     "maxcul.png",
-        "extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/admin/maxcul.png",
-        "keywords":                 ["cul", "MAX!", "868", "busware"],
-		"readme":                   "https://github.com/ioBroker/ioBroker.maxcul/blob/master/README.md",
-		"type":                     "hardware"
+        "platform": "javascript/Node.js",
+        "mode": "daemon",
+        "loglevel": "info",
+        "license": "GPL-2.0",
+        "enabled": true,
+        "messagebox": true,
+        "materialize": true,
+        "icon": "maxcul.png",
+        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/admin/maxcul.png",
+        "keywords": [
+            "cul",
+            "MAX!",
+            "868",
+            "busware"
+        ],
+        "readme": "https://github.com/ioBroker/ioBroker.maxcul/blob/master/README.md",
+        "type": "iot-systems",
+        "authors": [
+            {
+                "name": "bluefox",
+                "email": "dogafox@gmail.com"
+            }
+        ]
     },
     "native": {
         "serialport": "",
-        "baudrate":   38400,
+        "baudrate": 38400,
         "baseAddress": "123456",
-        "scanner": 10
+        "scanner": 0
     },
     "instanceObjects": [
         {
-            "_id":  "info",
+            "_id": "info",
             "type": "channel",
             "common": {
                 "name": "Information"
@@ -58,51 +130,51 @@
             "native": {}
         },
         {
-            "_id":  "info.connection",
+            "_id": "info.connection",
             "type": "state",
             "common": {
-                "role":  "indicator.connected",
-                "name":  "If connected to CUL",
-                "type":  "boolean",
-                "read":  true,
+                "role": "indicator.connected",
+                "name": "If connected to CUL",
+                "type": "boolean",
+                "read": true,
                 "write": false,
-                "def":   false
+                "def": false
             },
             "native": {}
         },
         {
-            "_id":  "info.limitOverflow",
+            "_id": "info.limitOverflow",
             "type": "state",
             "common": {
-                "role":  "indicator",
-                "name":  "Send limit overflow",
-                "type":  "boolean",
-                "read":  true,
+                "role": "indicator",
+                "name": "Send limit overflow",
+                "type": "boolean",
+                "read": true,
                 "write": false,
-                "def":   false
+                "def": false
             },
             "native": {}
         },
         {
-            "_id":  "info.quota",
+            "_id": "info.quota",
             "type": "state",
             "common": {
-                "role":  "state",
-                "name":  "Send quota",
-                "type":  "number",
-                "read":  true,
+                "role": "state",
+                "name": "Send quota",
+                "type": "number",
+                "read": true,
                 "write": false
             },
             "native": {}
         },
         {
-            "_id":  "info.version",
+            "_id": "info.version",
             "type": "state",
             "common": {
-                "role":  "state",
-                "name":  "CUL firmware version",
-                "type":  "string",
-                "read":  true,
+                "role": "state",
+                "name": "CUL firmware version",
+                "type": "string",
+                "read": true,
                 "write": false
             },
             "native": {}
