@@ -34,12 +34,31 @@ adapter.on('stateChange', (id, state) => {
         adapter.log.warn('id "' + id + '" is readonly');
         return;
     }
+    let type;
+    let dayType;
     let channel = id.split('.');
     const name = channel.pop();
-    const type = channel[channel.length - 1];
+    if (channel.length === 5) {
+    type = channel[channel.length - 2];
+    dayType = channel[channel.length - 1];
+    } else {
+    type = channel[channel.length - 1];
+    }
     if (type === 'config' ||
         type === 'displayConfig' ||
         type === 'valveConfig') channel.pop();
+
+    if (type === 'weekProfile') {
+        if (/setPointUntilTime/.test(name) && state.val !== formatTimeString(state.val)) adapter.setForeignState(id , formatTimeString(state.val));
+        if (!/send_/.test(name) || state.val === false) return;
+        channel.pop();
+        channel.pop();
+    }
+
+    if (type === 'vacationConfig') {
+        if (/untilDate/.test(name) && state.val !== formatUntilDate(state.val)) adapter.setForeignState(id, formatUntilDate(state.val));
+        return;
+    }
 
     channel = channel.join('.');
 
@@ -155,6 +174,7 @@ function sendValveConfig(channel) {
         timers[channel].decalcificationHour,
         timers[channel].maxValveSetting,
         timers[channel].valveOffset,
+        '00',
         objects[channel].native.type);
 
     delete timers[channel].boostDuration;
@@ -178,6 +198,102 @@ function sendTemperature(channel) {
     delete timers[channel].desiredTemperature;
 }
 
+function sendDayProfile(channel) {
+    if (!max) return;
+
+    var daySendArray = Object.keys(timers[channel]);
+    var daySend = daySendArray.filter(function(item){
+        return /^send_/.test(item);
+    });
+    var weekDay = daySend[0].slice(5,6);
+    var dayType = daySend[0].slice(4);
+    var sendId =  channel + '.weekProfile.' + dayType +'.' + daySend;
+    adapter.setForeignState(sendId, false);
+
+    max.sendProfileDay(
+        objects[channel].native.src,
+        weekDay,
+        timers[channel]._01_setPointTemp,
+        timers[channel]._01_setPointUntilTime,
+        timers[channel]._02_setPointTemp,
+        timers[channel]._02_setPointUntilTime,
+        timers[channel]._03_setPointTemp,
+        timers[channel]._03_setPointUntilTime,
+        timers[channel]._04_setPointTemp,
+        timers[channel]._04_setPointUntilTime,
+        timers[channel]._05_setPointTemp,
+        timers[channel]._05_setPointUntilTime,
+        timers[channel]._06_setPointTemp,
+        timers[channel]._06_setPointUntilTime,
+        timers[channel]._07_setPointTemp,
+        timers[channel]._07_setPointUntilTime,
+        '00',
+        objects[channel].native.type);
+
+    max.sendProfileDay2(
+        objects[channel].native.src,
+        weekDay,
+        timers[channel]._08_setPointTemp,
+        timers[channel]._08_setPointUntilTime,
+        timers[channel]._09_setPointTemp,
+        timers[channel]._09_setPointUntilTime,
+        timers[channel]._10_setPointTemp,
+        timers[channel]._10_setPointUntilTime,
+        timers[channel]._11_setPointTemp,
+        timers[channel]._11_setPointUntilTime,
+        timers[channel]._12_setPointTemp,
+        timers[channel]._12_setPointUntilTime,
+        timers[channel]._13_setPointTemp,
+        timers[channel]._13_setPointUntilTime,
+        '00',
+        objects[channel].native.type);
+
+    delete timers[channel]._01_setPointTemp;
+    delete timers[channel]._01_setPointUntilTime;
+    delete timers[channel]._02_setPointTemp;
+    delete timers[channel]._02_setPointUntilTime;
+    delete timers[channel]._03_setPointTemp;
+    delete timers[channel]._03_setPointUntilTime;
+    delete timers[channel]._04_setPointTemp;
+    delete timers[channel]._04_setPointUntilTime;
+    delete timers[channel]._05_setPointTemp;
+    delete timers[channel]._05_setPointUntilTime;
+    delete timers[channel]._06_setPointTemp;
+    delete timers[channel]._06_setPointUntilTime;
+    delete timers[channel]._07_setPointTemp;
+    delete timers[channel]._07_setPointUntilTime;
+
+    delete timers[channel]._08_setPointTemp;
+    delete timers[channel]._08_setPointUntilTime;
+    delete timers[channel]._09_setPointTemp;
+    delete timers[channel]._09_setPointUntilTime;
+    delete timers[channel]._10_setPointTemp;
+    delete timers[channel]._10_setPointUntilTime;
+    delete timers[channel]._11_setPointTemp;
+    delete timers[channel]._11_setPointUntilTime;
+    delete timers[channel]._12_setPointTemp;
+    delete timers[channel]._12_setPointUntilTime;
+    delete timers[channel]._13_setPointTemp;
+    delete timers[channel]._13_setPointUntilTime;
+
+    delete timers[channel][daySend];
+}
+
+function sendVacationConfig(channel) {
+    if (!max) return;
+
+    max.sendVacation(
+        objects[channel].native.src,
+        timers[channel].vacationTemperature,
+        timers[channel].mode,
+        timers[channel].untilDate,
+        '00',
+        objects[channel].native.type);
+    delete timers[channel].mode;
+    delete timers[channel].vacationTemperature;
+    delete timers[channel].untilDate;
+}
+
 function sendInfo(channel) {
     if (!timers[channel]) return;
 
@@ -189,8 +305,10 @@ function sendInfo(channel) {
 
     timers[channel].timer = null;
 
-    if (timers[channel].mode !== undefined || timers[channel].desiredTemperature !== undefined) {
+    if ((timers[channel].mode                !== undefined ||
+        timers[channel].desiredTemperature   !== undefined) && timers[channel].mode !==2) {
         timers[channel].requestRunning = false;
+        timers[channel].requestRunningMode = false;
 
         let count1 = 0;
         if (timers[channel].mode === undefined) {
@@ -383,6 +501,366 @@ function sendInfo(channel) {
         }
         if (!count3) sendValveConfig(channel);
     }
+
+    // weekProfile
+
+    if ((timers[channel].send_0_saturday   !== undefined && timers[channel].send_0_saturday === true) ||
+        (timers[channel].send_1_sunday     !== undefined && timers[channel].send_1_sunday === true) ||
+        (timers[channel].send_2_monday     !== undefined && timers[channel].send_2_monday == true) ||
+        (timers[channel].send_3_tuesday    !== undefined && timers[channel].send_3_tuesday === true) ||
+        (timers[channel].send_4_wednesday  !== undefined && timers[channel].send_4_wednesday === true) ||
+        (timers[channel].send_5_thursday   !== undefined && timers[channel].send_5_thursday === true) ||
+        (timers[channel].send_6_friday     !== undefined && timers[channel].send_6_friday === true)) {
+
+        let daySendArray = Object.keys(timers[channel]);
+        let daySend = daySendArray.filter(function(item){
+            return /^send_/.test(item);
+        });
+        let weekDay = daySend[0].substring(4);
+        let count4 = 0;
+        if (timers[channel]._01_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._01_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._01_setPointTemp = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._01_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._01_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._01_setPointUntilTime = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._02_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._02_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._02_setPointTemp = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._02_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._02_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._02_setPointUntilTime = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._03_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._03_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._03_setPointTemp = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._03_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._03_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._03_setPointUntilTime = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._04_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._04_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._04_setPointTemp = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._04_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._04_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._04_setPointUntilTime = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._05_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._05_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._05_setPointTemp = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._05_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._05_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._05_setPointUntilTime = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._06_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._06_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._06_setPointTemp = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._06_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._06_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._06_setPointUntilTime = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._07_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._07_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._07_setPointTemp = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._07_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._07_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._07_setPointUntilTime = state.val;
+                if(!--count4) sendDayProfile(channel);
+            });
+        }
+        if (timers[channel]._08_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._08_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._08_setPointTemp = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (timers[channel]._08_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._08_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._08_setPointUntilTime = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (timers[channel]._09_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._09_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._09_setPointTemp = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (timers[channel]._09_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._09_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._09_setPointUntilTime = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (timers[channel]._10_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._10_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._10_setPointTemp = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (timers[channel]._10_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._10_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._10_setPointUntilTime = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (timers[channel]._11_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._11_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._11_setPointTemp = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (timers[channel]._11_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._11_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._11_setPointUntilTime = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (timers[channel]._12_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._12_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._12_setPointTemp = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (timers[channel]._12_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._12_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._12_setPointUntilTime = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (timers[channel]._13_setPointTemp === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._13_setPointTemp', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 0;
+                }
+                timers[channel]._13_setPointTemp = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (timers[channel]._13_setPointUntilTime === undefined) {
+            count4++;
+            adapter.getForeignState(channel + '.weekProfile.' + weekDay + '._13_setPointUntilTime', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel]._13_setPointUntilTime = state.val;
+                if(!--count4) {
+                    sendDayProfile(channel);
+                }
+            });
+        }
+        if (!count4) sendDayProfile(channel);
+    }
+
+    // vacationTemperature, untilDate
+    if (timers[channel].mode !== undefined && timers[channel].mode === 2) {
+        timers[channel].requestRunning = false;
+        timers[channel].requestRunningMode = false;
+
+        let count5 = 0;
+        if (timers[channel].vacationTemperature === undefined) {
+            count5++;
+            adapter.getForeignState(channel + '.vacationConfig.vacationTemperature', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = 17;
+                }
+                timers[channel].vacationTemperature = state.val;
+                if (!--count5) sendVacationConfig(channel);
+            });
+        }
+        if (timers[channel].untilDate === undefined) {
+            count5++;
+            adapter.getForeignState(channel + '.vacationConfig.untilDate', (err, state) => {
+                if (!state || state.val === null || state.val === undefined) {
+                    state = state || {};
+                    state.val = '';
+                }
+                timers[channel].untilDate = state.val;
+                if (!--count5) sendVacationConfig(channel);
+            });
+        }
+        if (!count5) sendVacationConfig(channel);
+    }
 }
 
 const tasks = [];
@@ -442,15 +920,25 @@ function setStates(obj) {
         const meta = objects[oid];
         let val  = obj.data[state];
 
+        if (state === 'mode' && timers[adapter.namespace + '.' + id] && timers[adapter.namespace + '.' + id].requestRunning) {
+            adapter.log.debug(id + ': Ignore mode triggered by polling: ' + val);
+            continue;
+        }
         if (state === 'desiredTemperature' && timers[adapter.namespace + '.' + id] && timers[adapter.namespace + '.' + id].requestRunning) {
-            adapter.log.debug('Ignore desiredTemperature: ' + val);
+            adapter.log.debug(id + ': Ignore desiredTemperature triggered by polling: ' + val);
+            adapter.log.debug(id + ': Set initially desiredTemperature after polling: ' + timers[adapter.namespace + '.' + id].requestRunning);
+            adapter.log.debug(id + ': Set initially mode after polling: ' + timers[adapter.namespace + '.' + id].requestRunningMode);
             timers[adapter.namespace + '.' + id].desiredTemperature = timers[adapter.namespace + '.' + id].requestRunning;
-            timers[adapter.namespace + '.' + id].requestRunning = false ;
+            timers[adapter.namespace + '.' + id].mode = timers[adapter.namespace + '.' + id].requestRunningMode;
+            timers[adapter.namespace + '.' + id].requestRunning = false;
+            timers[adapter.namespace + '.' + id].requestRunningMode = false;
 
             setTimeout(channel => sendInfo(channel), 0, adapter.namespace + '.' + id);
             continue;
         }
-
+        if (state === 'untilDate' && val !== "") {
+        adapter.log.info('Device ' + adapter.namespace + '.' + id + ' in Vacation Mode until ' + val);
+        }
         if (meta) {
             if (meta.common.type === 'boolean') {
                 val = val === 'true' || val === true || val === 1 || val === '1' || val === 'on';
@@ -476,6 +964,78 @@ function syncObjects(objs) {
         tasks.push({type: 'object', id: objs[i]._id, obj: objs[i]});
     }
     if (isStart) processTasks()
+}
+
+function formatTimeString(timeString) {
+    var timeStringNum = timeString.toString().match(/\d/g);
+
+    if (timeStringNum !== null) {
+        var formattedTimeString = timeStringNum.join('');
+
+        if (formattedTimeString.length >= 3) {
+            formattedTimeString = formattedTimeString.slice(0, 4);
+            var leadingZeros = formattedTimeString.match(/^0+/g);
+            formattedTimeString = ((Math.round((parseInt(formattedTimeString, 10)) / 5)) * 5).toString();
+            if (formattedTimeString[(formattedTimeString.length - 2)] === '6') formattedTimeString = (parseInt(formattedTimeString, 10) + 40).toString();
+            if (leadingZeros !== null) formattedTimeString = leadingZeros.join('').concat(formattedTimeString);
+            formattedTimeString = formattedTimeString.substring((formattedTimeString.length - 4));
+        }
+
+        if (formattedTimeString.length === 1) formattedTimeString = '0' + formattedTimeString + ':' + '00';
+        if (formattedTimeString.length === 2) formattedTimeString = formattedTimeString + ':' + '00';
+        if (formattedTimeString.length === 3) formattedTimeString = '0' + formattedTimeString.substr(0, 1) + ':' + formattedTimeString.substr(1);
+        if (formattedTimeString.length === 4) formattedTimeString = formattedTimeString.substr(0, 2) + ':' + formattedTimeString.substr(2);
+    } else formattedTimeString = '';
+
+    if (!/[01][0-9]:[0-5][05]/.test(formattedTimeString) &&
+        !/[2][0-3]:[0-5][05]/.test(formattedTimeString)  &&
+        !/24:00/.test(formattedTimeString)               ||
+         /00:00/.test(formattedTimeString)) formattedTimeString = '';
+
+    return formattedTimeString;
+}
+
+function formatUntilDate(untilDateTimeString) {
+    var dateTimeStringNum = untilDateTimeString.match(/\d/g);
+
+    if (dateTimeStringNum !== null && dateTimeStringNum.length >= 12) {
+        var formattedDateTimeString = dateTimeStringNum.join('');
+
+        //little-endian order. DIN 5008 alternative. Traditional format in German
+        if (untilDateTimeString.search(/\W/) === 2) {
+            var formattedYearString = formattedDateTimeString.slice(4, 8);
+            var formattedMonthString = formattedDateTimeString.slice(2,4);
+            var formattedDayString = formattedDateTimeString.slice(0,2);
+            var formattedHourString = formattedDateTimeString.slice(8,10);
+            var formattedMinuteString = formattedDateTimeString.slice(10,12);
+        }
+        //big-endian order. ISO 8601, EN 28601 and DIN 5008. International. Compatible with widget "jqui-ctrl-input Datetime"
+        else if (untilDateTimeString.search(/\W/) === 4) {
+            var formattedYearString = formattedDateTimeString.slice(0, 4);
+            var formattedMonthString = formattedDateTimeString.slice(4,6);
+            var formattedDayString = formattedDateTimeString.slice(6,8);
+            var formattedHourString = formattedDateTimeString.slice(8,10);
+            var formattedMinuteString = formattedDateTimeString.slice(10,12);
+        } else return '';
+
+        formattedMinuteString = ((Math.round((parseInt(formattedMinuteString)) / 30)) * 30).toString();
+
+        if (formattedMinuteString === '60') {
+            formattedMinuteString = '00';
+            formattedHourString = (parseInt(formattedHourString, 10) + 1).toString();
+        }
+        if (formattedHourString.length < 2) formattedHourString = '0' + formattedHourString;
+        if (formattedMinuteString.length < 2) formattedMinuteString = '0' + formattedMinuteString;
+        if (/[2][0][1-5][1-9]/.test(formattedYearString) &&
+            (/[0][0-9]/.test(formattedMonthString) || /[1][0-2]/.test(formattedMonthString)) &&
+            (/[0-2][0-9]/.test(formattedDayString) || /[3][0-1]/.test(formattedDayString)) &&
+            (/[01][0-9]/.test(formattedHourString) || /[2][0-3]/.test(formattedHourString) || /24/.test(formattedHourString))) {
+//            formattedDateTimeString = formattedYearString + '-' + formattedMonthString + '-' +  formattedDayString + ' ' + formattedHourString + ':' + formattedMinuteString;
+            formattedDateTimeString = formattedDayString + '-' + formattedMonthString + '-' + formattedYearString + ' ' + formattedHourString + ':' + formattedMinuteString;
+        } else formattedDateTimeString = '';
+
+    } else formattedDateTimeString = '';
+    return formattedDateTimeString;
 }
 
 function hex2a(hexx) {
@@ -505,7 +1065,7 @@ function createThermostat(data, prefix) {
     //    "panel": 0,                  // <==
     //    "rfError": 0,                // <==
     //    "batteryLow": 0,             // <==
-    //    "untilString": ""
+    //    "untilDate": ""
     //};
 
     // comfortTemperature, ecoTemperature, minimumTemperature, maximumTemperature, offset, windowOpenTime, windowOpenTemperature
@@ -538,9 +1098,13 @@ function createThermostat(data, prefix) {
             read: true,
             write: true,
             states: {
-                0: 'auto',
+                0: 'auto weekly',
                 1: 'manual',
-                3: 'boost'
+                2: 'vacation',
+                3: 'boost',
+                4: 'manual eco',
+                5: 'manual comfort',
+                6: 'manual window'
             }
         },
         type: 'state',
@@ -707,8 +1271,8 @@ function createThermostat(data, prefix) {
             type: 'number',
             read: true,
             write: true,
-            min: 4.5,
-            max: 30.5,
+            min: -3.5,
+            max: 3.5,
             role: 'level.temperature',
             unit: '°C'
         },
@@ -742,7 +1306,7 @@ function createThermostat(data, prefix) {
             read: true,
             write: true,
             role: 'level.interval',
-            unit: 'sec'
+            unit: 'min'
         },
         type: 'state',
         native: data
@@ -774,7 +1338,7 @@ function createThermostat(data, prefix) {
             min: 0,
             max: 60,
             role: 'level.duration',
-            unit: 'sec'
+            unit: 'min'
         },
         type: 'state',
         native: data
@@ -808,16 +1372,16 @@ function createThermostat(data, prefix) {
             min: 0,
             max: 6,
             states: {
-                0: 'Sunday',
-                1: 'Monday',
-                2: 'Tuesday',
-                3: 'Wednesday',
-                4: 'Thursday',
-                5: 'Friday',
-                6: 'Saturday'
+                0: 'Saturday',
+                1: 'Sunday',
+                2: 'Monday',
+                3: 'Tuesday',
+                4: 'Wednesday',
+                5: 'Thursday',
+                6: 'Friday'
             },
             role: 'level.day',
-            unit: '%'
+            unit: ''
         },
         type: 'state',
         native: data
@@ -874,6 +1438,118 @@ function createThermostat(data, prefix) {
         native: data
     };
     objs.push(obj);
+
+    obj = {
+        _id: adapter.namespace + '.' + data.serial + '.vacationConfig.vacationTemperature',
+        common: {
+            name: prefix + 'Thermostat ' + data.serial + ' set vacation temperature',
+            type: 'number',
+            read: true,
+            write: true,
+            min: 4.5,
+            max: 30.5,
+            role: 'level.temperature',
+            unit: '°C'
+        },
+        type: 'state',
+        native: data
+    };
+    objs.push(obj);
+
+    obj = {
+        _id: adapter.namespace + '.' + data.serial + '.vacationConfig.untilDate',
+        common: {
+            name: prefix + 'Thermostat ' + data.serial + ' set vacation until date (dd-MM-yyyy HH:mm)',
+            type: 'string',
+            read: true,
+            write: true,
+            role: 'until.date',
+            unit: ''
+        },
+        type: 'state',
+        native: data
+    };
+    objs.push(obj);
+
+
+    // weekProfile
+
+    var weekDay, setPointNumber;
+    for (var n = 0; n <= 6; n++) {
+
+        switch (n) {
+            case 0:
+                weekDay='saturday';
+                break;
+            case 1:
+                weekDay='sunday';
+                break;
+            case 2:
+                weekDay='monday';
+                break;
+            case 3:
+                weekDay='tuesday';
+                break;
+            case 4:
+                weekDay='wednesday';
+                break;
+            case 5:
+                weekDay='thursday';
+                break;
+            case 6:
+                weekDay='friday';
+                break;
+        }
+
+        for (var i = 1; i <= 13; i++) {
+            setPointNumber = i.toString();
+            if (i <= 9) setPointNumber = '0' + setPointNumber;
+            obj = {
+                _id: adapter.namespace + '.' + data.serial + '.weekProfile._' + n + '_' + weekDay + '._' + setPointNumber + '_setPointTemp',
+                common: {
+                    name: prefix + 'Thermostat ' + data.serial + ' ' + weekDay + ' setPoint ' + setPointNumber + ' temperature',
+                    type: 'number',
+                    read: true,
+                    write: true,
+                    min: 4.5,
+                    max: 30.5,
+                    role: 'weekProfile.' + weekDay,
+                    unit: '°C'
+                },
+                type: 'state',
+                native: data
+            };
+            objs.push(obj);
+
+            obj = {
+                _id: adapter.namespace + '.' + data.serial + '.weekProfile._' + n + '_' + weekDay + '._' + setPointNumber + '_setPointUntilTime',
+                common: {
+                    name: prefix + 'Thermostat ' + data.serial + ' ' + weekDay + ' setPoint ' + setPointNumber + ' until time',
+                    type: 'string',
+                    read: true,
+                    write: true,
+                    role: 'weekProfile.' + weekDay
+                },
+                type: 'state',
+                native: data
+            };
+            objs.push(obj);
+        }
+
+        obj = {
+            _id: adapter.namespace + '.' + data.serial + '.weekProfile._' + n + '_' + weekDay + '.send_' + n + '_' + weekDay,
+            common: {
+                name: prefix + 'Thermostat ' + data.serial + ' send ' + weekDay + ' Profile ',
+                type: 'boolean',
+                read: true,
+                write: true,
+                role: 'weekProfile.' + weekDay
+            },
+            type: 'state',
+            native: data
+        };
+        objs.push(obj);
+    }
 
     syncObjects(objs);
 }
@@ -1068,29 +1744,72 @@ function createContact(data) {
 function pollDevice(id) {
     const src = objects[id].native.src;
     if (credits < 400 || !devices[src]) {
+        adapter.log.info('Not enough credit for Polling(min.400): ' + credits);
         return;
     }
     devices[src].lastReceived = new Date().getTime();
     adapter.getForeignState(id + '.mode', (err, state) => {
         adapter.getForeignState(id + '.desiredTemperature', (err, stateTemp) => {
             if (state && state.val !== null && state.val !== undefined) {
+                let oldMode = state.val;
+                let newMode = state.val;
+                let oldVal = stateTemp.val;
                 let newVal = stateTemp.val;
-                const oldVal = stateTemp.val;
-                newVal = newVal + 0.5;
-                if (newVal > 30) newVal = 29.5;
-                const mode   = state.val;
+                if (state.val === 3) {
+                    adapter.log.info('No Polling during boost-mode. Device: ' + id);
+                    return;
+                }
+                if (state.val === 0 || state.val === 2) {
+                    newMode = 1;
+                } else {
+                    newVal = newVal + 0.5;
+                    if (newVal > 30) newVal = 29.5;
+                    if (state.val > 3) {
+                        oldMode = 1;
+                        newMode = 1;
+                    }
+                }
                 timers[id] = timers[id] || {};
                 if (timers[id].requestRunning) {
-                    adapter.log.info('Poll device1 : ' + mode + ', ' + newVal + ' ignored, still running');
+                    adapter.log.info('Poll device : ' + newMode + ', ' + newVal + ' ignored, still running');
                     return;
                 }
                 timers[id].requestRunning = oldVal;
-                adapter.log.info('Poll device1 : ' + mode + ', ' + newVal);
+                timers[id].requestRunningMode = oldMode;
+                adapter.log.info('Poll device ' + id + ' : ' + newMode + ', ' + newVal);
 
                 max.sendDesiredTemperature(
                     src,
                     newVal,
-                    mode,
+                    newMode,
+                    '00',
+                    objects[id].native.type);
+            }
+        });
+    });
+}
+
+function resetPollDevice(id) {
+    var src = objects[id].native.src;
+    if (credits < 120 || !devices[src]) {
+        adapter.log.info('Not enough credit for Poll-Reset(min.120): ' + credits);
+        return;
+    }
+    devices[src].lastReceived = new Date().getTime();
+    adapter.getForeignState(id + '.mode', (err, state) => {
+        adapter.getForeignState(id + '.desiredTemperature', (err, stateTemp) => {
+            if (state && state.val !== null && state.val !== undefined) {
+                var oldMode = state.val;
+                var oldVal = stateTemp.val;
+                timers[id] = timers[id] || {};
+                timers[id].requestRunning = false;
+                timers[id].requestRunningMode = false;
+                adapter.log.info('Poll-Timeout: Reset Polling for device ' + id + ' : ' + oldMode + ', ' + oldVal);
+
+                max.sendDesiredTemperature(
+                    src,
+                    oldVal,
+                    oldMode,
                     '00',
                     objects[id].native.type);
             }
@@ -1118,10 +1837,25 @@ function connect() {
     if (adapter.config.scanner) {
         thermostatTimer = setInterval(() => {
             const now = new Date().getTime();
+            let pollPause = 0;
             for (const id in objects) {
                 if (objects.hasOwnProperty(id) && objects[id].type === 'channel' && (objects[id].native.type === 1 || objects[id].native.type === 2 || objects[id].native.type === 3)) {
                     if (devices[objects[id].native.src] && (!devices[objects[id].native.src].lastReceived || now - devices[objects[id].native.src].lastReceived > adapter.config.scanner * 60000)) {
-                        pollDevice(id);
+                        setTimeout(function(pDevice) {
+                            adapter.log.debug('Try to Poll Device: ' + pDevice);
+                            pollDevice(pDevice);
+                        },pollPause,id);
+                        pollPause = pollPause + 5000;
+                    }
+                    if (devices[objects[id].native.src].lastReceived && timers[id]) {
+                        var received = now - devices[objects[id].native.src].lastReceived;
+                        adapter.log.debug(id + '  Request: ' + timers[id].requestRunningMode + ',' + timers[id].requestRunning + '  Last-Received: ' + received);
+                        if (timers[id].requestRunning && now - devices[objects[id].native.src].lastReceived > 300000) {
+                            setTimeout(function(resetPDevice) {
+                                resetPollDevice(resetPDevice);
+                            },pollPause,id);
+                            pollPause = pollPause + 5000;
+                        }
                     }
                 }
             }
@@ -1175,7 +1909,7 @@ function connect() {
         }
     });
 
-    max.on('WallThermostatStateRecieved', data => {
+    max.on('WallThermostatStateReceived', data => {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1189,7 +1923,7 @@ function connect() {
         adapter.log.debug('WallThermostatStateReceived: ' + JSON.stringify(data));
     });
 
-    max.on('WallThermostatControlRecieved', data => {
+    max.on('WallThermostatControlReceived', data => {
         if (!connected) {
             connected = true;
             adapter.setState('info.connection', true, true);
@@ -1200,7 +1934,7 @@ function connect() {
             adapter.log.warn('Unknown device: ' + JSON.stringify(data));
             //createWallThermostat(data);
         }
-        adapter.log.debug('WallThermostatControlRecieved: ' + JSON.stringify(data));
+        adapter.log.debug('WallThermostatControlReceived: ' + JSON.stringify(data));
     });
 
     max.on('ThermostatStateReceived', data => {
@@ -1212,7 +1946,7 @@ function connect() {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
         }
-        //ThermostatStateReceived: {"src":"160bd0","mode":1,"desiredTemperature":30.5,"valvePosition":100,"measuredTemperature":22.4,"dstSetting":1,"lanGateway":1,"panel":0,"rfError":0,"batteryLow":0,"untilString":""}
+        //ThermostatStateReceived: {"src":"160bd0","mode":1,"desiredTemperature":30.5,"valvePosition":100,"measuredTemperature":22.4,"dstSetting":1,"lanGateway":1,"panel":0,"rfError":0,"batteryLow":0,"untilDate":""}
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
         } else {
@@ -1329,7 +2063,7 @@ function connect() {
                 panel: 0,
                 rfError: 0,
                 batteryLow: 0,
-                untilString: '',
+                untilDate: '',
                 rssi: 10
             });
         }, 1200);
