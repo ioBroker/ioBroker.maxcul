@@ -120,13 +120,13 @@ function checkPort(callback) {
             autoOpen: false
         });
         sPort.on('error', err => {
-            if (sPort.isOpen()) sPort.close();
+            if (sPort.isOpen) sPort.close();
             if (callback) callback(err);
             callback = null;
         });
 
         sPort.open(err => {
-            if (sPort.isOpen()) sPort.close();
+            if (sPort.isOpen) sPort.close();
 
             if (callback) callback(err);
             callback = null;
@@ -134,7 +134,7 @@ function checkPort(callback) {
     } catch (e) {
         adapter.log.error('Cannot open port: ' + e);
         try {
-            if (sPort.isOpen()) sPort.close();
+            if (sPort.isOpen) sPort.close();
         } catch (ee) {
 
         }
