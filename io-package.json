@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "maxcul",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "news": {
+            "1.1.0": {
+                "en": "nodejs 10 and 12 now supported, thermostat functions and configurations enhanced, error handling and polling optimized",
+                "de": "Die Knoten 10 und 12 werden jetzt unterstützt, Thermostatfunktionen und -konfigurationen verbessert, Fehlerbehandlung und Abfrage optimiert",
+                "ru": "Теперь поддерживаются ноды 10 и 12, улучшены функции и конфигурации термостата, оптимизирована обработка ошибок и опрос",
+                "pt": "o nodejs 10 e 12 agora suportados, funções e configurações do termostato aprimoradas, manipulação de erros e pesquisa otimizada",
+                "nl": "nodejs 10 en 12 worden nu ondersteund, thermostaatfuncties en -configuraties verbeterd, foutafhandeling en polling geoptimaliseerd",
+                "fr": "Les nœuds 10 et 12 sont maintenant pris en charge, les fonctions et les configurations du thermostat sont améliorées, la gestion des erreurs et la scrutation sont optimisées.",
+                "it": "nodejs 10 e 12 ora supportati, funzioni e configurazioni del termostato migliorate, gestione degli errori e polling ottimizzati",
+                "es": "Ahora se admiten los nodos 10 y 12, funciones y configuraciones de termostato mejoradas, manejo de errores y sondeo optimizados",
+                "pl": "Obsługiwane są teraz nodejs 10 i 12, rozszerzono funkcje i konfiguracje termostatu, zoptymalizowano obsługę błędów i odpytywanie",
+                "zh-cn": "现在支持nodejs 10和12，增强了恒温器功能和配置，优化了错误处理和轮询"
+            },
             "1.0.0": {
                 "en": "Wall thermostat was added",
                 "de": "Wandthermostat wurde hinzugefügt",
