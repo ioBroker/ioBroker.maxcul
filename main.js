@@ -1702,7 +1702,7 @@ function createContact(data) {
         _id: adapter.namespace + '.' + data.serial,
         common: {
             role: 'indicator',
-            name: 'Push button ' + data.serial
+            name: 'Contact ' + data.serial
         },
         type: 'channel',
         native: data
@@ -1777,7 +1777,7 @@ function pollDevice(id) {
     devices[src].lastReceived = new Date().getTime();
     adapter.getForeignState(id + '.mode', (err, state) => {
         adapter.getForeignState(id + '.desiredTemperature', (err, stateTemp) => {
-            if (state && state.val !== null && state.val !== undefined) {
+            if (state && state.val !== null && state.val !== undefined && stateTemp && stateTemp.val !== null && stateTemp.val !== undefined) {
                 let oldMode = state.val;
                 let newMode = state.val;
                 let oldVal = stateTemp.val;
@@ -1940,7 +1940,7 @@ function connect() {
             setStates({serial: devices[data.src].native.serial, data: data});
         } else {
             adapter.log.warn('Unknown device: ' + JSON.stringify(data));
-            createButton(data);
+            createContact(data);
         }
     });
 
