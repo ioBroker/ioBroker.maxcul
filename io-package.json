@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "maxcul",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "news": {
+            "1.1.1": {
+                "en": "fixes and optimizations",
+                "de": "Korrekturen und Optimierungen",
+                "ru": "исправления и оптимизации",
+                "pt": "correções e otimizações",
+                "nl": "fixes en optimalisaties",
+                "fr": "corrections et optimisations",
+                "it": "correzioni e ottimizzazioni",
+                "es": "correcciones y optimizaciones",
+                "pl": "poprawki i optymalizacje",
+                "zh-cn": "修复和优化"
+            },
             "1.1.0": {
                 "en": "nodejs 10 and 12 now supported, thermostat functions and configurations enhanced, error handling and polling optimized",
                 "de": "Die Knoten 10 und 12 werden jetzt unterstützt, Thermostatfunktionen und -konfigurationen verbessert, Fehlerbehandlung und Abfrage optimiert",
