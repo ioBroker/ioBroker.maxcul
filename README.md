@@ -1,7 +1,7 @@
 ![Logo](admin/maxcul.png)
 # ioBroker.maxcul
 ==================================
-[![NPM version](http://img.shields.io/npm/v/iobroker.maxcul.svg)](https://www.npmjs.com/package/iobroker.maxcul)
+![Number of Installations](http://iobroker.live/badges/maxcul-installed.svg) ![Number of Installations](http://iobroker.live/badges/maxcul-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.maxcul.svg)](https://www.npmjs.com/package/iobroker.maxcul)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.maxcul.svg)](https://www.npmjs.com/package/iobroker.maxcul)
 [![Tests](https://travis-ci.org/ioBroker/ioBroker.maxcul.svg?branch=master)](https://travis-ci.org/ioBroker/ioBroker.maxcul)
 
@@ -23,6 +23,14 @@ Before using you must first pair the devcies with ioBroker.
 E.g. for thermostats press longer the "boost" button till the countdown will start.
 
 ## Changelog
+### 1.1.0 (2019-07-04)
+* (bowao) support nodejs 10 and 12
+* (bowao) add thermostat week profile
+* (bowao) add thermostat vacation config
+* (bowao) add new thermostat modes: manual eco; manual comfort; manual window
+* (bowao) add poll timeout after 5 minutes of no response from thermostat
+* (bowao) optimize error handling for incomplete packages
+
 ### 1.0.0 (2018-10-20)
 * (Arne Stenmannsr) Wall thermostat was added
 
