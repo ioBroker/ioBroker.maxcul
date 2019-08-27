@@ -142,7 +142,8 @@
         "serialport": "",
         "baudrate": 38400,
         "baseAddress": "123456",
-        "scanner": 0
+        "scanner": 0,
+        "pairMode": false
     },
     "instanceObjects": [
         {
@@ -162,6 +163,19 @@
                 "type": "boolean",
                 "read": true,
                 "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.enablePairMode",
+            "type": "state",
+            "common": {
+                "role": "indicator",
+                "name": "enable pairing mode for 30 seconds",
+                "type": "boolean",
+                "read": true,
+                "write": true,
                 "def": false
             },
             "native": {}
