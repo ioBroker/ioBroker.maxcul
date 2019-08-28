@@ -168,7 +168,7 @@
             "native": {}
         },
         {
-            "_id": "info.enablePairMode",
+            "_id": "info.enablePairingMode",
             "type": "state",
             "common": {
                 "role": "indicator",

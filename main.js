@@ -71,7 +71,7 @@ adapter.on('stateChange', (id, state) => {
             objects[channel].native.src,
             state.val);
     } 
-    if (name === 'pairMode') {
+    if (name === 'enablePairingMode') {
         if(!max) return;
         if(state.val === 'false' || state.val === '0') state.val = false;
         adapter.log.debug('Set Pairmode to ' + state.val);
@@ -80,7 +80,7 @@ adapter.on('stateChange', (id, state) => {
         {
             pairingTimer = setTimeout(function () {
                 max.pairModeEnabled = false;
-                adapter.setState('info.pairMode',false,true);
+                adapter.setState('enablePairingMode',false,true);
             }, 30000);
         }
     } else {
