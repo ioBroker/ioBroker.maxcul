@@ -80,12 +80,12 @@ adapter.on('stateChange', (id, state) => {
         {
             pairingTimer = setTimeout(function () {
                 max.pairModeEnabled = false;
-                adapter.setState('enablePairingMode',false,true);
+                adapter.setState('info.enablePairingMode',false,true);
             }, 30000);
         } else {
             if(pairingTimer !== undefined)
                 clearTimeout(pairingTimer);
-            adapter.setState('enablePairingMode',false,true);
+            adapter.setState('info.enablePairingMode',false,true);
         }
     } else {
         if (timers[channel]) clearTimeout(timers[channel].timer);
