@@ -82,6 +82,9 @@ adapter.on('stateChange', (id, state) => {
                 max.pairModeEnabled = false;
                 adapter.setState('enablePairingMode',false,true);
             }, 30000);
+        } else {
+            clearTimeout(pairingTimer);
+            adapter.setState('enablePairingMode',false,true);
         }
     } else {
         if (timers[channel]) clearTimeout(timers[channel].timer);
