@@ -83,7 +83,8 @@ adapter.on('stateChange', (id, state) => {
                 adapter.setState('enablePairingMode',false,true);
             }, 30000);
         } else {
-            clearTimeout(pairingTimer);
+            if(pairingTimer !== undefined)
+                clearTimeout(pairingTimer);
             adapter.setState('enablePairingMode',false,true);
         }
     } else {
