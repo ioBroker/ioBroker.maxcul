@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "maxcul",
-        "version": "1.1.1",
+        "version": "1.1.2",
         "news": {
+            "1.1.2": {
+                "en": "User enabled pairingmode. Fixes and optimizations",
+                "de": "Vom Benutzer aktivierter Pairing-Modus. Korrekturen und Optimierungen",
+                "ru": "Пользователь включил режим сопряжения. Исправления и оптимизации",
+                "pt": "Modo de emparelhamento ativado pelo usuário. Correções e otimizações",
+                "nl": "Door de gebruiker ingeschakelde koppelingsmodus. Fixes en optimalisaties",
+                "fr": "Mode de couplage activé par l'utilisateur. Corrections et optimisations",
+                "it": "Modalità pairing abilitata dall'utente. Correzioni e ottimizzazioni",
+                "es": "Modo de emparejamiento habilitado por el usuario. Arreglos y optimizaciones",
+                "pl": "Tryb parowania włączony przez użytkownika. Poprawki i optymalizacje",
+                "zh-cn": "用户启用了pairingmode。修复和优化"
+              },
             "1.1.1": {
                 "en": "fixes and optimizations",
                 "de": "Korrekturen und Optimierungen",
@@ -142,7 +154,8 @@
         "serialport": "",
         "baudrate": 38400,
         "baseAddress": "123456",
-        "scanner": 0
+        "scanner": 0,
+        "pairMode": false
     },
     "instanceObjects": [
         {
@@ -162,6 +175,19 @@
                 "type": "boolean",
                 "read": true,
                 "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.enablePairingMode",
+            "type": "state",
+            "common": {
+                "role": "indicator",
+                "name": "enable pairing mode for 30 seconds",
+                "type": "boolean",
+                "read": true,
+                "write": true,
                 "def": false
             },
             "native": {}

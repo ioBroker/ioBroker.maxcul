@@ -5,7 +5,7 @@
     "email": "dogafox@gmail.com"
   },
   "description": "Javascript/Node.js based Busware CUL USB / culfw adapter",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "bugs": {
     "url": "https://github.com/ioBroker/ioBroker.maxcul/issues"
   },

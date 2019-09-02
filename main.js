@@ -15,6 +15,7 @@ let credits = 0;
 let connected = false;
 let creditsTimer;
 let thermostatTimer;
+var pairingTimer;
 
 try {
     SerialPort = require('serialport');
@@ -69,6 +70,23 @@ adapter.on('stateChange', (id, state) => {
         max.sendSetDisplayActualTemperature(
             objects[channel].native.src,
             state.val);
+    } 
+    if (name === 'enablePairingMode') {
+        if(!max) return;
+        if(state.val === 'false' || state.val === '0') state.val = false;
+        adapter.log.debug('Set Pairmode to ' + state.val);
+        max.pairModeEnabled = state.val;
+        if(max.pairModeEnabled === true)
+        {
+            pairingTimer = setTimeout(function () {
+                max.pairModeEnabled = false;
+                adapter.setState('info.enablePairingMode',false,true);
+            }, 30000);
+        } else {
+            if(pairingTimer !== undefined)
+                clearTimeout(pairingTimer);
+            adapter.setState('info.enablePairingMode',false,true);
+        }
     } else {
         if (timers[channel]) clearTimeout(timers[channel].timer);
 
