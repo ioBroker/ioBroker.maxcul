@@ -36,13 +36,7 @@
     "cul stick",
     "home automation"
   ],
-  "license": "GPL-2.0",
-  "licenses": [
-    {
-      "type": "GPL-2.0",
-      "url": "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/LICENSE"
-    }
-  ],
+  "license": "GPL-2.0-only",
   "main": "main.js",
   "maintainers": [
     {
