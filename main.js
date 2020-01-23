@@ -15,6 +15,7 @@ let credits = 0;
 let connected = false;
 let creditsTimer;
 let thermostatTimer;
+var pairingTimer;
 
 try {
     SerialPort = require('serialport');
@@ -69,6 +70,23 @@ adapter.on('stateChange', (id, state) => {
         max.sendSetDisplayActualTemperature(
             objects[channel].native.src,
             state.val);
+    } 
+    if (name === 'enablePairingMode') {
+        if(!max) return;
+        if(state.val === 'false' || state.val === '0') state.val = false;
+        adapter.log.debug('Set Pairmode to ' + state.val);
+        max.pairModeEnabled = state.val;
+        if(max.pairModeEnabled === true)
+        {
+            pairingTimer = setTimeout(function () {
+                max.pairModeEnabled = false;
+                adapter.setState('info.enablePairingMode',false,true);
+            }, 30000);
+        } else {
+            if(pairingTimer !== undefined)
+                clearTimeout(pairingTimer);
+            adapter.setState('info.enablePairingMode',false,true);
+        }
     } else {
         if (timers[channel]) clearTimeout(timers[channel].timer);
 
@@ -1779,7 +1797,7 @@ function pollDevice(id) {
     devices[src].lastReceived = new Date().getTime();
     adapter.getForeignState(id + '.mode', (err, state) => {
         adapter.getForeignState(id + '.desiredTemperature', (err, stateTemp) => {
-            if (state && state.val !== null && state.val !== undefined) {
+            if (state && state.val !== null && state.val !== undefined && stateTemp && stateTemp.val !== null && stateTemp.val !== undefined) {
                 let oldMode = state.val;
                 let newMode = state.val;
                 let oldVal = stateTemp.val;
@@ -1944,8 +1962,6 @@ function connect() {
             setStates({serial: devices[data.src].native.serial, data: data});
         } else {
             adapter.log.warn('Unknown device: ' + JSON.stringify(data));
-            //IllumNus: kein Button, ShutterContact
-            //createButton(data);
             createContact(data);
         }
     });
