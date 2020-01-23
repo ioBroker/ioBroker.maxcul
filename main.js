@@ -1156,9 +1156,7 @@ function createThermostat(data, prefix) {
         data.serial = hex2a(data.raw.substring(data.raw.length - 20));
     }
 
-    if (!data.serial) {
-        data.serial = data.src.toUpperCase();
-    }
+    data.serial = data.serial || data.src.toUpperCase();
 
     let obj = {
         _id: adapter.namespace + '.' + data.serial,
@@ -1750,13 +1748,13 @@ function createContact(data) {
         data.serial = hex2a(data.raw.substring(data.raw.length - 20));
     }
 
-    if (!data.serial) data.serial = data.src.toUpperCase();
+    data.serial = data.serial || data.src.toUpperCase();
 
     let obj = {
         _id: adapter.namespace + '.' + data.serial,
         common: {
             role: 'indicator',
-            name: 'Contact ' + data.serial
+            name: 'Window/door contact ' + data.serial
         },
         type: 'channel',
         native: data
@@ -1991,9 +1989,13 @@ function connect() {
             limitOverflow = false;
             adapter.setState('info.limitOverflow', false, true);
         }
+
         adapter.log.debug('ShutterContactStateReceived: ' + JSON.stringify(data));
+
+        data.type = data.type || 4;
+
         if (devices[data.src]) {
-            setStates({serial: devices[data.src].native.serial, data: data});
+            setStates({serial: devices[data.src].native.serial, data});
         } else {
             adapter.log.warn('Unknown device: ' + JSON.stringify(data));
             createContact(data);
@@ -2046,6 +2048,9 @@ function connect() {
             adapter.setState('info.limitOverflow', false, true);
         }
         //ThermostatStateReceived: {"src":"160bd0","mode":1,"desiredTemperature":30.5,"valvePosition":100,"measuredTemperature":22.4,"dstSetting":1,"lanGateway":1,"panel":0,"rfError":0,"batteryLow":0,"untilDate":""}
+        
+        data.type = data.type || 2;
+        
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
         } else {
@@ -2065,6 +2070,9 @@ function connect() {
             adapter.setState('info.limitOverflow', false, true);
         }
         adapter.log.debug('PushButtonStateReceived: ' + JSON.stringify(data));
+        
+        data.type = data.type || 5;
+
         if (devices[data.src]) {
             setStates({serial: devices[data.src].native.serial, data: data});
         } else {
