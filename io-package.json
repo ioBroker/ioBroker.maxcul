@@ -146,6 +146,7 @@
         "messagebox": true,
         "materialize": true,
         "icon": "maxcul.png",
+        "compact": true,
         "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/admin/maxcul.png",
         "keywords": [
             "cul",
