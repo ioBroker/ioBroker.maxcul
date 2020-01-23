@@ -1,9 +1,11 @@
-/* jshint -W097 */// jshint strict:false
-/*jslint node: true */
+/* jshint -W097 */
+/* jshint strict: false */
+/* jslint node: true */
 
 'use strict';
 // you have to require the utils module and call adapter function
-const utils = require('@iobroker/adapter-core'); // Get common adapter utils
+const utils       = require('@iobroker/adapter-core'); // Get common adapter utils
+const adapterName = require('./package.json').name.split('.').pop();
 
 let max;
 const objects = {};
@@ -15,120 +17,154 @@ let credits = 0;
 let connected = false;
 let creditsTimer;
 let thermostatTimer;
-var pairingTimer;
+let pairingTimer = null;
+let pollTimers = {};
 
 try {
     SerialPort = require('serialport');
 } catch (err) {
     console.error('Cannot load serialport module');
 }
+let adapter;
 
-const adapter = utils.Adapter('maxcul');
+function startAdapter(options) {
+    options = options || {};
+    Object.assign(options, {name: adapterName});
+    adapter = new utils.Adapter(options);
 
-adapter.on('stateChange', (id, state) => {
-    if (!id || !state || state.ack) return;
-    if (!objects[id] || !objects[id].native) {
-        adapter.log.warn('Unknown ID: ' + id);
-        return;
-    }
-    if (!objects[id].common.write) {
-        adapter.log.warn('id "' + id + '" is readonly');
-        return;
-    }
-    let type;
-    let dayType;
-    let channel = id.split('.');
-    const name = channel.pop();
-    if (channel.length === 5) {
-    type = channel[channel.length - 2];
-    dayType = channel[channel.length - 1];
-    } else {
-    type = channel[channel.length - 1];
-    }
-    if (type === 'config' ||
-        type === 'displayConfig' ||
-        type === 'valveConfig') channel.pop();
-
-    if (type === 'weekProfile') {
-        if (/setPointUntilTime/.test(name) && state.val !== formatTimeString(state.val)) adapter.setForeignState(id , formatTimeString(state.val));
-        if (!/send_/.test(name) || state.val === false) return;
-        channel.pop();
-        channel.pop();
-    }
-
-    if (type === 'vacationConfig') {
-        if (/untilDate/.test(name) && state.val !== formatUntilDate(state.val)) adapter.setForeignState(id, formatUntilDate(state.val));
-        return;
-    }
-
-    channel = channel.join('.');
-
-    if (name === 'display') {
-        if (!max) return;
-        if (state.val === 'false' || state.val === '0') state.val = false;
-        adapter.log.debug('sendSetDisplayActualTemperature(' + channel + ', ' + state.val + ')');
-        max.sendSetDisplayActualTemperature(
-            objects[channel].native.src,
-            state.val);
-    } 
-    if (name === 'enablePairingMode') {
-        if(!max) return;
-        if(state.val === 'false' || state.val === '0') state.val = false;
-        adapter.log.debug('Set Pairmode to ' + state.val);
-        max.pairModeEnabled = state.val;
-        if(max.pairModeEnabled === true)
-        {
-            pairingTimer = setTimeout(function () {
-                max.pairModeEnabled = false;
-                adapter.setState('info.enablePairingMode',false,true);
-            }, 30000);
+    adapter.on('stateChange', (id, state) => {
+        if (!id || !state || state.ack) return;
+        if (!objects[id] || !objects[id].native) {
+            adapter.log.warn('Unknown ID: ' + id);
+            return;
+        }
+        if (!objects[id].common.write) {
+            adapter.log.warn('id "' + id + '" is readonly');
+            return;
+        }
+        let type;
+        let dayType;
+        let channel = id.split('.');
+        const name = channel.pop();
+        if (channel.length === 5) {
+            type = channel[channel.length - 2];
+            dayType = channel[channel.length - 1];
         } else {
-            if(pairingTimer !== undefined)
-                clearTimeout(pairingTimer);
-            adapter.setState('info.enablePairingMode',false,true);
+            type = channel[channel.length - 1];
         }
-    } else {
-        if (timers[channel]) clearTimeout(timers[channel].timer);
+        if (type === 'config' ||
+            type === 'displayConfig' ||
+            type === 'valveConfig') channel.pop();
 
-        timers[channel] = timers[channel] || {};
-        timers[channel][name] = state.val;
-        timers[channel].timer = setTimeout(ch => sendInfo(ch), 1000, channel);
-    }
-});
+        if (type === 'weekProfile') {
+            if (/setPointUntilTime/.test(name) && state.val !== formatTimeString(state.val)) adapter.setForeignState(id , formatTimeString(state.val));
+            if (!/send_/.test(name) || state.val === false) return;
+            channel.pop();
+            channel.pop();
+        }
 
-adapter.on('unload', callback => {
-    if (adapter && adapter.setState) adapter.setState('info.connection', false, true);
-    if (max) max.disconnect();
-    callback();
-});
+        if (type === 'vacationConfig') {
+            if (/untilDate/.test(name) && state.val !== formatUntilDate(state.val)) adapter.setForeignState(id, formatUntilDate(state.val));
+            return;
+        }
 
-adapter.on('ready', main);
+        channel = channel.join('.');
 
-adapter.on('message', obj => {
-    if (obj) {
-        switch (obj.command) {
-            case 'listUart':
-                if (obj.callback) {
-                    if (SerialPort) {
-                        // read all found serial ports
-                        SerialPort.list((err, ports) => {
-                            adapter.log.info('List of port: ' + JSON.stringify(ports));
-                            adapter.sendTo(obj.from, obj.command, ports, obj.callback);
-                        });
-                    } else {
-                        adapter.log.warn('Module serialport is not available');
-                        adapter.sendTo(obj.from, obj.command, [{comName: 'Not available'}], obj.callback);
+        if (name === 'display') {
+            if (!max) return;
+            if (state.val === 'false' || state.val === '0') state.val = false;
+            adapter.log.debug('sendSetDisplayActualTemperature(' + channel + ', ' + state.val + ')');
+            max.sendSetDisplayActualTemperature(
+                objects[channel].native.src,
+                state.val);
+        }
+        if (name === 'enablePairingMode') {
+            if (!max) {
+                return;
+            }
+            if (state.val === 'false' || state.val === '0') {
+                state.val = false;
+            }
+            adapter.log.debug('Set Pairing mode to ' + state.val);
+            max.pairModeEnabled = state.val;
+
+            if (max.pairModeEnabled === true || max.pairModeEnabled === 'true' || max.pairModeEnabled === 1 || max.pairModeEnabled === '1') {
+                pairingTimer = setTimeout(() => {
+                    max.pairModeEnabled = false;
+                    adapter.setState('info.enablePairingMode', false, true);
+                }, 30000);
+            } else {
+                pairingTimer && clearTimeout(pairingTimer);
+                pairingTimer = null;
+                adapter.setState('info.enablePairingMode', false, true);
+            }
+        } else {
+            timers[channel] && timers[channel].timer && clearTimeout(timers[channel].timer);
+
+            timers[channel] = timers[channel] || {};
+            timers[channel][name] = state.val;
+            timers[channel].timer = setTimeout(ch => sendInfo(ch), 1000, channel);
+        }
+    });
+
+    adapter.on('unload', callback => {
+        adapter && adapter.setState && adapter.setState('info.connection', false, true);
+
+        max && max.disconnect();
+        max = null;
+
+        if (pairingTimer) {
+            clearTimeout(pairingTimer);
+            pairingTimer = null;
+        }
+
+        Object.keys(timers).forEach(channel => {
+            if (timers[channel] && timers[channel].timer) {
+                clearTimeout(timers[channel].timer);
+                timers[channel].timer = null;
+            }
+        });
+
+        Object.keys(pollTimers).forEach(id => {
+            if (pollTimers[id]) {
+                clearTimeout(pollTimers[id]);
+                delete pollTimers[id];
+            }
+        });
+
+        callback();
+    });
+
+    adapter.on('ready', main);
+
+    adapter.on('message', obj => {
+        if (obj) {
+            switch (obj.command) {
+                case 'listUart':
+                    if (obj.callback) {
+                        if (SerialPort) {
+                            // read all found serial ports
+                            SerialPort.list((err, ports) => {
+                                adapter.log.info('List of port: ' + JSON.stringify(ports));
+                                adapter.sendTo(obj.from, obj.command, ports, obj.callback);
+                            });
+                        } else {
+                            adapter.log.warn('Module serialport is not available');
+                            adapter.sendTo(obj.from, obj.command, [{comName: 'Not available'}], obj.callback);
+                        }
                     }
-                }
 
-                break;
+                    break;
+            }
         }
-    }
-});
+    });
+
+    return adapter;
+}
 
 function checkPort(callback) {
     if (!adapter.config.serialport) {
-        if (callback) callback('Port is not selected');
+        callback && callback('Port is not selected');
         return;
     }
     let sPort;
@@ -138,25 +174,25 @@ function checkPort(callback) {
             autoOpen: false
         });
         sPort.on('error', err => {
-            if (sPort.isOpen) sPort.close();
-            if (callback) callback(err);
+            sPort.isOpen && sPort.close();
+            callback && callback(err);
             callback = null;
         });
 
         sPort.open(err => {
-            if (sPort.isOpen) sPort.close();
+            sPort.isOpen && sPort.close();
 
-            if (callback) callback(err);
+            callback && callback(err);
             callback = null;
         });
     } catch (e) {
         adapter.log.error('Cannot open port: ' + e);
         try {
-            if (sPort.isOpen) sPort.close();
+            sPort.isOpen && sPort.close();
         } catch (ee) {
 
         }
-        if (callback) callback(e);
+        callback && callback(e);
     }
 }
 
@@ -914,14 +950,14 @@ function processTasks() {
     if (tasks.length) {
         const task = tasks.shift();
         if (task.type === 'state') {
-            adapter.setForeignState(task.id, task.val, true, () => setTimeout(processTasks, 0));
+            adapter.setForeignState(task.id, task.val, true, () => setImmediate(processTasks));
         } else if (task.type === 'object') {
             adapter.getForeignObject(task.id, (err, obj) => {
                 if (!obj) {
                     objects[task.id] = task.obj;
                     adapter.setForeignObject(task.id, task.obj, (err, res) => {
                         adapter.log.info('object ' + adapter.namespace + '.' + task.id + ' created');
-                        setTimeout(processTasks, 0);
+                        setImmediate(processTasks);
                     });
                 } else {
                     let changed = false;
@@ -934,16 +970,16 @@ function processTasks() {
                         objects[obj._id] = obj;
                         adapter.setForeignObject(obj._id, obj, (err, res) => {
                             adapter.log.info('object ' + adapter.namespace + '.' + obj._id + ' created');
-                            setTimeout(processTasks, 0);
+                            setImmediate(processTasks);
                         });
                     } else {
-                        setTimeout(processTasks, 0);
+                        setImmediate(processTasks);
                     }
                 }
             });
         } else {
             adapter.log.error('Unknown task: ' + task.type);
-            setTimeout(processTasks, 0);
+            setImmediate(processTasks);
         }
     }
 }
@@ -978,7 +1014,7 @@ function setStates(obj) {
             timers[adapter.namespace + '.' + id].requestRunning = false;
             timers[adapter.namespace + '.' + id].requestRunningMode = false;
 
-            setTimeout(channel => sendInfo(channel), 0, adapter.namespace + '.' + id);
+            setImmediate(channel => sendInfo(channel), 0, adapter.namespace + '.' + id);
             continue;
         }
         if (state === 'untilDate' && val !== "") {
@@ -1889,7 +1925,7 @@ function connect() {
         logger: adapter.log
     };
 
-    const Max = require(__dirname + '/lib/maxcul')(env);
+    const Max = require('./lib/maxcul')(env);
 
     max = new Max(adapter.config.baseAddress, true, adapter.config.serialport, parseInt(adapter.config.baudrate, 10) || 9600);
 
@@ -1902,19 +1938,21 @@ function connect() {
             for (const id in objects) {
                 if (objects.hasOwnProperty(id) && objects[id].type === 'channel' && (objects[id].native.type === 1 || objects[id].native.type === 2 || objects[id].native.type === 3)) {
                     if (devices[objects[id].native.src] && (!devices[objects[id].native.src].lastReceived || now - devices[objects[id].native.src].lastReceived > adapter.config.scanner * 60000)) {
-                        setTimeout(function(pDevice) {
+                        pollTimers[id] = setTimeout(pDevice => {
+                            delete pollTimers[pDevice];
                             adapter.log.debug('Try to Poll Device: ' + pDevice);
                             pollDevice(pDevice);
-                        },pollPause,id);
+                        }, pollPause, id);
                         pollPause = pollPause + 5000;
                     }
                     if (devices[objects[id].native.src].lastReceived && timers[id]) {
-                        var received = now - devices[objects[id].native.src].lastReceived;
+                        const received = now - devices[objects[id].native.src].lastReceived;
                         adapter.log.debug(id + '  Request: ' + timers[id].requestRunningMode + ',' + timers[id].requestRunning + '  Last-Received: ' + received);
                         if (timers[id].requestRunning && now - devices[objects[id].native.src].lastReceived > 300000) {
-                            setTimeout(function(resetPDevice) {
+                            pollTimers['reset_' + id] = setTimeout(resetPDevice => {
+                                delete pollTimers['reset_' + resetPDevice];
                                 resetPollDevice(resetPDevice);
-                            },pollPause,id);
+                            }, pollPause, id);
                             pollPause = pollPause + 5000;
                         }
                     }
@@ -2190,4 +2228,12 @@ function main() {
             adapter.subscribeStates('*');
         });
     });
+}
+
+// If started as allInOne/compact mode => return function to create instance
+if (module && module.parent) {
+    module.exports = startAdapter;
+} else {
+    // or start the instance directly
+    startAdapter();
 }

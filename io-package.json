@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "maxcul",
-        "version": "1.1.2",
+        "version": "1.2.0",
         "news": {
+            "1.2.0": {
+                "en": "Refactoring",
+                "de": "Refactoring",
+                "ru": "Рефакторинг",
+                "pt": "Reestruturação",
+                "nl": "refactoring",
+                "fr": "Refactoring",
+                "it": "refactoring",
+                "es": "Refactorización",
+                "pl": "Refaktoryzacja",
+                "zh-cn": "重构"
+            },
             "1.1.2": {
                 "en": "User enabled pairingmode. Fixes and optimizations",
                 "de": "Vom Benutzer aktivierter Pairing-Modus. Korrekturen und Optimierungen",

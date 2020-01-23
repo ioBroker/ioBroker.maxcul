@@ -1,32 +1,30 @@
 /* jshint -W097 */// jshint strict:false
 /*jslint node: true */
-var expect = require('chai').expect;
-var setup  = require(__dirname + '/lib/setup');
+const expect = require('chai').expect;
+const setup  = require(__dirname + '/lib/setup');
 
-var objects = null;
-var states  = null;
-var onStateChanged = null;
-var onObjectChanged = null;
-var sendToID = 1;
+let objects = null;
+let states  = null;
+let onStateChanged = null;
+const onObjectChanged = null;
+let sendToID = 1;
 
-var adapterShortName = setup.adapterName.substring(setup.adapterName.indexOf('.') + 1);
+const adapterShortName = setup.adapterName.substring(setup.adapterName.indexOf('.') + 1);
 
 function checkConnectionOfAdapter(cb, counter) {
     counter = counter || 0;
     console.log('Try check #' + counter);
     if (counter > 30) {
-        if (cb) cb('Cannot check connection');
-        return;
+        return cb && cb('Cannot check connection');
     }
 
     states.getState('system.adapter.' + adapterShortName + '.0.alive', function (err, state) {
         if (err) console.error(err);
         if (state && state.val) {
-            if (cb) cb();
+            cb && cb();
         } else {
-            setTimeout(function () {
-                checkConnectionOfAdapter(cb, counter + 1);
-            }, 1000);
+            setTimeout(() =>
+                checkConnectionOfAdapter(cb, counter + 1), 1000);
         }
     });
 }
@@ -34,21 +32,19 @@ function checkConnectionOfAdapter(cb, counter) {
 function checkValueOfState(id, value, cb, counter) {
     counter = counter || 0;
     if (counter > 20) {
-        if (cb) cb('Cannot check value Of State ' + id);
-        return;
+        return cb && cb('Cannot check value Of State ' + id);
     }
 
     states.getState(id, function (err, state) {
         if (err) console.error(err);
         if (value === null && !state) {
-            if (cb) cb();
+            cb && cb();
         } else
         if (state && (value === undefined || state.val === value)) {
-            if (cb) cb();
+            cb && cb();
         } else {
-            setTimeout(function () {
-                checkValueOfState(id, value, cb, counter + 1);
-            }, 500);
+            setTimeout(() =>
+                checkValueOfState(id, value, cb, counter + 1), 500);
         }
     });
 }
@@ -77,8 +73,8 @@ describe('Test ' + adapterShortName + ' adapter', function() {
     before('Test ' + adapterShortName + ' adapter: Start js-controller', function (_done) {
         this.timeout(600000); // because of first install from npm
 
-        setup.setupController(function () {
-            var config = setup.getAdapterConfig();
+        setup.setupController(() => {
+            const config = setup.getAdapterConfig();
             // enable adapter
             config.common.enabled  = true;
             config.common.loglevel = 'debug';
@@ -101,10 +97,9 @@ describe('Test ' + adapterShortName + ' adapter', function() {
 /*
     ENABLE THIS WHEN ADAPTER RUNS IN DEAMON MODE TO CHECK THAT IT HAS STARTED SUCCESSFULLY
 */
-    it('Test ' + adapterShortName + ' adapter: Check if adapter started', function (done) {
-        this.timeout(60000);
+    it('Test ' + adapterShortName + ' adapter: Check if adapter started', done => {
         checkConnectionOfAdapter(function (res) {
-            if (res) console.log(res);
+            res && console.log(res);
             expect(res).not.to.be.equal('Cannot check connection');
             objects.setObject('system.adapter.test.0', {
                     common: {
@@ -112,12 +107,12 @@ describe('Test ' + adapterShortName + ' adapter', function() {
                     },
                     type: 'instance'
                 },
-                function () {
+                () => {
                     states.subscribeMessage('system.adapter.test.0');
                     done();
                 });
         });
-    });
+    }).timeout(60000);
 /**/
 
 /*
