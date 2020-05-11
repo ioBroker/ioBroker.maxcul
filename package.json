@@ -16,18 +16,18 @@
     }
   ],
   "dependencies": {
-    "moment": "^2.24.0",
+    "moment": "^2.25.3",
     "bluebird": "^3.7.2",
-    "serialport": "^7.1.5",
-    "bitset": "^5.1.0",
-    "binary-parser": "^1.5.0",
+    "serialport": "^8.0.8",
+    "bitset": "^5.1.1",
+    "binary-parser": "^1.6.2",
     "sprintf-js": "^1.1.2",
-    "@iobroker/adapter-core": "^1.0.3"
+    "@iobroker/adapter-core": "^2.4.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "gulp": "^4.0.2",
-    "mocha": "^7.0.0"
+    "mocha": "^7.1.2"
   },
   "directories": {},
   "homepage": "https://github.com/ioBroker/ioBroker.maxcul",
