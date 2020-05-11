@@ -1,0 +1,4 @@
+chore: release v1.3.0
+
+Support nodejs 12+14
+Prevent warnings in js-controller 3

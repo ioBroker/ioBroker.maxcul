@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "maxcul",
-        "version": "1.2.0",
+        "version": "1.3.0",
         "news": {
+            "1.3.0": {
+                "en": "Support nodejs 12+14\nPrevent warnings in js-controller 3",
+                "de": "Unterstützt die Knoten 12 + 14\nVerhindern Sie Warnungen in js-controller 3",
+                "ru": "Поддержка nodejs 12 + 14\nПредотвратить предупреждения в js-controller 3",
+                "pt": "Suporte nodejs 12 + 14\nImpedir avisos no controlador js 3",
+                "nl": "Ondersteuning van nodejs 12 + 14\nVoorkom waarschuwingen in js-controller 3",
+                "fr": "Prise en charge de nodejs 12 + 14\nEmpêcher les avertissements dans js-controller 3",
+                "it": "Supporta nodejs 12 + 14\nPrevenire gli avvisi in js-controller 3",
+                "es": "Soporte nodejs 12 + 14\nEvitar advertencias en js-controller 3",
+                "pl": "Wspieraj nodejs 12 + 14\nZapobiegaj ostrzeżeniom w sterowniku js 3",
+                "zh-cn": "支持nodejs 12 + 14\n防止js-controller 3中的警告"
+            },
             "1.2.0": {
                 "en": "Refactoring",
                 "de": "Refactoring",
@@ -26,7 +38,7 @@
                 "es": "Modo de emparejamiento habilitado por el usuario. Arreglos y optimizaciones",
                 "pl": "Tryb parowania włączony przez użytkownika. Poprawki i optymalizacje",
                 "zh-cn": "用户启用了pairingmode。修复和优化"
-              },
+            },
             "1.1.1": {
                 "en": "fixes and optimizations",
                 "de": "Korrekturen und Optimierungen",
