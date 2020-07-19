@@ -144,13 +144,13 @@ function startAdapter(options) {
                     if (obj.callback) {
                         if (SerialPort) {
                             // read all found serial ports
-                            SerialPort.list((err, ports) => {
+                            SerialPort.list().then((ports) => {
                                 adapter.log.info('List of port: ' + JSON.stringify(ports));
                                 adapter.sendTo(obj.from, obj.command, ports, obj.callback);
                             });
                         } else {
                             adapter.log.warn('Module serialport is not available');
-                            adapter.sendTo(obj.from, obj.command, [{comName: 'Not available'}], obj.callback);
+                            adapter.sendTo(obj.from, obj.command, [{path: 'Not available'}], obj.callback);
                         }
                     }
 

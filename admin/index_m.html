@@ -39,12 +39,12 @@
             var $serialport = $('#serialport');
             var text = list.length ? '<option value="">' + _('Select port') + '</option>' : '<option value="">' + _('No ports found') + '</option>';
             for (var j = 0; j < list.length; j++) {
-                if (list[j].comName === 'Not available') {
+                if (list[j].path === 'Not available') {
                     text += '<option value="" selected>' + _('Not available') + '</option>';
                     $serialport.prop('disabled', true);
                     break;
                 } else {
-                    text += '<option value="' + list[j].comName + '" ' + ((actualValue === list[j].comName) ? 'selected' : '') + '>' + list[j].comName + '</option>';
+                    text += '<option value="' + list[j].path + '" ' + ((actualValue === list[j].path) ? 'selected' : '') + '>' + list[j].path + '</option>';
                 }
             }
             $serialport.html(text).select();
