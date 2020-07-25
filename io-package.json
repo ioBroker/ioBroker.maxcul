@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "maxcul",
-        "version": "1.3.0",
+        "version": "1.3.1",
         "news": {
+            "1.3.1": {
+                "en": "Fix unhandled exception\nFix serial port selection\nUpdate dependencies",
+                "de": "Nicht behandelte Ausnahme behoben\nKorrigieren Sie die Auswahl der seriellen Schnittstelle\nAbhängigkeiten aktualisieren",
+                "ru": "Исправить необработанное исключение\nИсправить выбор последовательного порта\nОбновить зависимости",
+                "pt": "Corrigir exceção não tratada\nCorrigir seleção de porta serial\nAtualizar dependências",
+                "nl": "Los onverwerkte uitzondering op\nFix seriële poortselectie\nUpdate afhankelijkheden",
+                "fr": "Correction d'une exception non gérée\nCorrection de la sélection du port série\nMettre à jour les dépendances",
+                "it": "Correzione dell'eccezione non gestita\nCorreggi la selezione della porta seriale\nAggiorna dipendenze",
+                "es": "Arreglar excepción no controlada\nFijar selección de puerto serie\nActualizar dependencias",
+                "pl": "Napraw nieobsługiwany wyjątek\nNapraw wybór portu szeregowego\nZaktualizuj zależności",
+                "zh-cn": "修复未处理的异常\n修复串口选择\n更新依赖"
+            },
             "1.3.0": {
                 "en": "Support nodejs 12+14\nPrevent warnings in js-controller 3",
                 "de": "Unterstützt die Knoten 12 + 14\nVerhindern Sie Warnungen in js-controller 3",
