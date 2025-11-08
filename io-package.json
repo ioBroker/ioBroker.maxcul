@@ -165,7 +165,10 @@
         "platform": "javascript/Node.js",
         "mode": "daemon",
         "loglevel": "info",
-        "license": "GPL-2.0-only",
+        "licenseInformation": {
+            "type": "free",
+            "license": "GPL-2.0-only"
+        },
         "enabled": true,
         "messagebox": true,
         "materialize": true,
