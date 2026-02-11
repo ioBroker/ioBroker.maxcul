@@ -21,9 +21,9 @@ let pairingTimer = null;
 let pollTimers = {};
 
 try {
-  const { SerialPort } = require("serialport");
+  SerialPort = require("serialport").SerialPort;
 } catch (err) {
-  console.error("Cannot load serialport module");
+  adapter.log.error("Cannot load serialport module");
 }
 let adapter;
 
