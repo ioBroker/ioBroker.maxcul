@@ -21,7 +21,7 @@ let pairingTimer = null;
 let pollTimers = {};
 
 try {
-  SerialPort = require("serialport");
+  const { SerialPort } = require("serialport");
 } catch (err) {
   console.error("Cannot load serialport module");
 }
@@ -159,12 +159,17 @@ function startAdapter(options) {
         case "listUart":
           if (obj.callback) {
             if (SerialPort) {
-              // read all found serial ports
-              SerialPort.list().then((ports) => {
-                adapter.log.info("List of port: " + JSON.stringify(ports));
-                adapter.sendTo(obj.from, obj.command, ports, obj.callback);
-              });
-            } else {
+                SerialPort.list().then((ports) => {
+                    // Filter auf ttyACM / ttyUSB optional
+                    const filtered = ports.filter(p => p.path && p.path.match(/ttyACM|ttyUSB/));
+
+                    adapter.log.info("List of ports: " + JSON.stringify(filtered));
+                    adapter.sendTo(obj.from, obj.command, filtered, obj.callback);
+                }).catch(err => {
+                    adapter.log.error("Error listing serial ports: " + err);
+                    adapter.sendTo(obj.from, obj.command, [], obj.callback);
+                });
+            }else {
               adapter.log.warn("Module serialport is not available");
               adapter.sendTo(
                 obj.from,
