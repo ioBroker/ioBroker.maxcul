@@ -23,6 +23,8 @@ Before using you must first pair the devcies with ioBroker.
 E.g. for thermostats press longer the "boost" button till the countdown will start.
 
 ## Changelog
+### 1.3.2 (2026-02-11)
+* (9Mad-Max5) Updating serialport to version 12.0.0 to support nodejs 20
 
 ### 1.3.1 (2020-07-26)
 * (bowao) Fix unhandled exception
