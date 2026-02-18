@@ -7,3 +7,5 @@ iob_npm.done
 .vscode/launch.json
 .vscode
 package-lock.json
+#ignore .commitinfo created by ioBroker release script
+.commitinfo
