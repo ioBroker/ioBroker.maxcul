@@ -87,4 +87,4 @@ E.g. for thermostats press longer the "boost" button till the countdown will sta
 
 ## License
 
-[Licensed under GPLv2](LICENSE) Copyright (c) 2017-2020 bluefox <dogafox@gmail.com>
+[Licensed under GPLv2](LICENSE) Copyright (c) 2017-2026 bluefox <dogafox@gmail.com>
