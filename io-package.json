@@ -177,6 +177,7 @@
         "platform": "javascript/Node.js",
         "mode": "daemon",
         "loglevel": "info",
+        "tier": 2,
         "license": "GPL-2.0-only",
         "enabled": true,
         "messagebox": true,
