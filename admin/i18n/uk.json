@@ -1,0 +1,12 @@
+{
+    "serialPort": "Послідовний порт",
+    "baudRate": "Швидкість передачі",
+    "baseAddress": "Базова адреса",
+    "baseAddressHelp": "6-значна HEX-адреса",
+    "baseAddressMustHave6HEX": "Базова адреса повинна мати 6 символів HEX",
+    "scanInterval": "Інтервал сканування (хвилини)",
+    "selectPort": "Виберіть порт",
+    "noPortsFound": "Порти не знайдені",
+    "notAvailable": "Недоступно"
+}
+

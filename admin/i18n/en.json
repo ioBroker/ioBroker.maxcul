@@ -1,0 +1,11 @@
+{
+    "serialPort": "Serial port",
+    "baudRate": "Baud rate",
+    "baseAddress": "Base address",
+    "baseAddressHelp": "6 digit HEX address",
+    "baseAddressMustHave6HEX": "Base address must have 6 HEX symbols",
+    "scanInterval": "Scan interval (minutes)",
+    "selectPort": "Select port",
+    "noPortsFound": "No ports found",
+    "notAvailable": "Not available"
+}

@@ -1,0 +1,12 @@
+{
+    "serialPort": "Seriële poort",
+    "baudRate": "Baudrate",
+    "baseAddress": "Basis adres",
+    "baseAddressHelp": "6-cijferig HEX-adres",
+    "baseAddressMustHave6HEX": "Het basisadres moet 6 HEX-symbolen bevatten",
+    "scanInterval": "Scaninterval (minuten)",
+    "selectPort": "Selecteer poort",
+    "noPortsFound": "Geen poorten gevonden",
+    "notAvailable": "Niet beschikbaar"
+}
+

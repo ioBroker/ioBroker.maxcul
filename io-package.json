@@ -163,6 +163,19 @@
             }
         },
         "title": "max! CUL",
+        "titleLang": {
+            "en": "max! CUL",
+            "de": "max! CUL",
+            "ru": "max! CUL",
+            "pt": "max! CUL",
+            "nl": "max! CUL",
+            "fr": "max! CUL",
+            "it": "max! CUL",
+            "es": "max! CUL",
+            "pl": "max! CUL",
+            "uk": "max! CUL",
+            "zh-cn": "max! CUL"
+        },
         "desc": {
             "en": "Control max! devices over CUL stick",
             "de": "Steuere max! Geräte mit CUL stick",
@@ -184,7 +197,9 @@
         "tier": 2,
         "enabled": true,
         "messagebox": true,
-        "materialize": true,
+        "adminUI": {
+            "config": "json"
+        },
         "icon": "maxcul.png",
         "compact": true,
         "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/admin/maxcul.png",

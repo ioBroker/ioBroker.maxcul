@@ -1,0 +1,12 @@
+{
+    "serialPort": "串口",
+    "baudRate": "波特率",
+    "baseAddress": "基地址",
+    "baseAddressHelp": "6位HEX地址",
+    "baseAddressMustHave6HEX": "基地址必须有6个HEX符号",
+    "scanInterval": "扫描间隔（分钟）",
+    "selectPort": "选择端口",
+    "noPortsFound": "未找到端口",
+    "notAvailable": "不可用"
+}
+

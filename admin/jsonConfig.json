@@ -1,0 +1,63 @@
+{
+    "i18n": true,
+    "type": "panel",
+    "items": {
+        "serialport": {
+            "type": "selectSendTo",
+            "label": "serialPort",
+            "command": "listUart",
+            "jsonData": "{}",
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "manual": true,
+            "alsoDependsOn": ["baudrate"],
+            "newLine": true
+        },
+        "baudrate": {
+            "type": "select",
+            "label": "baudRate",
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "options": [
+                { "label": "110", "value": 110 },
+                { "label": "150", "value": 150 },
+                { "label": "300", "value": 300 },
+                { "label": "600", "value": 600 },
+                { "label": "1200", "value": 1200 },
+                { "label": "2400", "value": 2400 },
+                { "label": "4800", "value": 4800 },
+                { "label": "9600", "value": 9600 },
+                { "label": "19200", "value": 19200 },
+                { "label": "38400", "value": 38400 },
+                { "label": "56000", "value": 56000 },
+                { "label": "57600", "value": 57600 },
+                { "label": "115200", "value": 115200 }
+            ],
+            "newLine": true
+        },
+        "baseAddress": {
+            "type": "text",
+            "label": "baseAddress",
+            "maxLength": 6,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "help": "baseAddressHelp",
+            "validator": "data.baseAddress && /^[0-9a-fA-F]{6}$/.test(data.baseAddress)",
+            "validatorErrorText": "baseAddressMustHave6HEX",
+            "newLine": true
+        },
+        "scanner": {
+            "type": "number",
+            "label": "scanInterval",
+            "min": 0,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "newLine": true
+        }
+    }
+}
+

@@ -1,0 +1,12 @@
+{
+    "serialPort": "Port szeregowy",
+    "baudRate": "Szybkość transmisji",
+    "baseAddress": "Adres bazowy",
+    "baseAddressHelp": "6-cyfrowy adres HEX",
+    "baseAddressMustHave6HEX": "Adres bazowy musi mieć 6 symboli HEX",
+    "scanInterval": "Interwał skanowania (minuty)",
+    "selectPort": "Wybierz port",
+    "noPortsFound": "Nie znaleziono portów",
+    "notAvailable": "Niedostępne"
+}
+

@@ -1,0 +1,11 @@
+{
+    "serialPort": "Порт",
+    "baudRate": "Скорость",
+    "baseAddress": "Базовый адрес",
+    "baseAddressHelp": "6-значный HEX-адрес",
+    "baseAddressMustHave6HEX": "Базовый адрес должен иметь 6 символов HEX",
+    "scanInterval": "Период сканирования (в минутах)",
+    "selectPort": "выберите порт",
+    "noPortsFound": "Порты не найдены",
+    "notAvailable": "Не доступно"
+}

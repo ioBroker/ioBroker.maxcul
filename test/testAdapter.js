@@ -1,7 +1,7 @@
 /* jshint -W097 */// jshint strict:false
 /*jslint node: true */
-const expect = require('chai').expect;
-const setup  = require(__dirname + '/lib/setup');
+const assert = require('node:assert');
+const setup = require('@iobroker/legacy-testing');
 
 let objects = null;
 let states  = null;
@@ -12,39 +12,21 @@ let sendToID = 1;
 const adapterShortName = setup.adapterName.substring(setup.adapterName.indexOf('.') + 1);
 
 function checkConnectionOfAdapter(cb, counter) {
-    counter = counter || 0;
-    console.log('Try check #' + counter);
+    counter ||= 0;
+    console.log(`Try check #${counter}`);
     if (counter > 30) {
         return cb && cb('Cannot check connection');
     }
 
-    states.getState('system.adapter.' + adapterShortName + '.0.alive', function (err, state) {
-        if (err) console.error(err);
-        if (state && state.val) {
-            cb && cb();
+    states.getState(`system.adapter.${adapterShortName}.0.alive`, (err, state) => {
+        if (err) {
+            console.error(err);
+        }
+        if (state?.val) {
+            cb?.();
         } else {
             setTimeout(() =>
                 checkConnectionOfAdapter(cb, counter + 1), 1000);
-        }
-    });
-}
-
-function checkValueOfState(id, value, cb, counter) {
-    counter = counter || 0;
-    if (counter > 20) {
-        return cb && cb('Cannot check value Of State ' + id);
-    }
-
-    states.getState(id, function (err, state) {
-        if (err) console.error(err);
-        if (value === null && !state) {
-            cb && cb();
-        } else
-        if (state && (value === undefined || state.val === value)) {
-            cb && cb();
-        } else {
-            setTimeout(() =>
-                checkValueOfState(id, value, cb, counter + 1), 500);
         }
     });
 }
@@ -56,7 +38,7 @@ function sendTo(target, command, message, callback) {
         }
     };
 
-    states.pushMessage('system.adapter.' + target, {
+    states.pushMessage(`system.adapter.${target}`, {
         command:    command,
         message:    message,
         from:       'system.adapter.test.0',
@@ -64,13 +46,13 @@ function sendTo(target, command, message, callback) {
             message: message,
             id:      sendToID++,
             ack:     false,
-            time:    (new Date()).getTime()
+            time:    Date.now(),
         }
     });
 }
 
-describe('Test ' + adapterShortName + ' adapter', function() {
-    before('Test ' + adapterShortName + ' adapter: Start js-controller', function (_done) {
+describe(`Test ${adapterShortName} adapter`, function() {
+    before(`Test ${adapterShortName} adapter: Start js-controller`, function (_done) {
         this.timeout(600000); // because of first install from npm
 
         setup.setupController(async () => {
@@ -97,10 +79,10 @@ describe('Test ' + adapterShortName + ' adapter', function() {
 /*
     ENABLE THIS WHEN ADAPTER RUNS IN DEAMON MODE TO CHECK THAT IT HAS STARTED SUCCESSFULLY
 */
-    it('Test ' + adapterShortName + ' adapter: Check if adapter started', done => {
+    it(`Test ${adapterShortName} adapter: Check if adapter started`, done => {
         checkConnectionOfAdapter(function (res) {
             res && console.log(res);
-            expect(res).not.to.be.equal('Cannot check connection');
+            assert(res !== 'Cannot check connection');
             objects.setObject('system.adapter.test.0', {
                     common: {
 
@@ -124,11 +106,11 @@ describe('Test ' + adapterShortName + ' adapter', function() {
     You can also use "sendTo" method to send messages to the started adapter
 */
 
-    after('Test ' + adapterShortName + ' adapter: Stop js-controller', function (done) {
+    after(`Test ${adapterShortName} adapter: Stop js-controller`, function (done) {
         this.timeout(10000);
 
         setup.stopController(function (normalTerminated) {
-            console.log('Adapter normal terminated: ' + normalTerminated);
+            console.log(`Adapter normal terminated: ${normalTerminated}`);
             done();
         });
     });

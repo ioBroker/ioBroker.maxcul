@@ -1,0 +1,12 @@
+{
+    "serialPort": "Puerto serial",
+    "baudRate": "Velocidad de baudios",
+    "baseAddress": "Dirección base",
+    "baseAddressHelp": "Dirección HEX de 6 dígitos",
+    "baseAddressMustHave6HEX": "La dirección base debe tener 6 símbolos HEX",
+    "scanInterval": "Intervalo de escaneo (minutos)",
+    "selectPort": "Seleccionar puerto",
+    "noPortsFound": "No se encontraron puertos",
+    "notAvailable": "No disponible"
+}
+
