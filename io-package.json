@@ -177,8 +177,11 @@
         "platform": "javascript/Node.js",
         "mode": "daemon",
         "loglevel": "info",
+        "licenseInformation": {
+            "type": "free",
+            "license": "GPL-2.0-only"
+        },
         "tier": 2,
-        "license": "GPL-2.0-only",
         "enabled": true,
         "messagebox": true,
         "materialize": true,
