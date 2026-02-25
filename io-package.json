@@ -1,301 +1,228 @@
 {
-    "common": {
-        "name": "maxcul",
-        "version": "1.3.2",
-        "news": {
-            "1.3.2": {
-                "en": "Updating serialport to version 12.0.0 to support nodejs 20",
-                "de": "Aktualisierung von serialport auf Version 12.0.0 zur Unterstützung von nodejs 20",
-                "ru": "Обновление serialport до версии 12.0.0 для поддержки nodejs 20",
-                "pt": "Atualizando serialport para a versão 12.0.0 para suportar nodejs 20",
-                "nl": "Serialport bijwerken naar versie 12.0.0 om nodejs 20 te ondersteunen",
-                "fr": "Mise à jour de serialport vers la version 12.0.0 pour prendre en charge nodejs 20",
-                "it": "Aggiornamento di serialport alla versione 12.0.0 per supportare nodejs 20",
-                "es": "Actualizando serialport a la versión 12.0.0 para soportar nodejs 20",
-                "pl": "Aktualizacja serialport do wersji 12.0.0, aby obsługiwać nodejs 20",
-                "zh-cn": "将serialport更新到版本12.0.0以支持nodejs 20"
-            },
-            "1.3.1": {
-                "en": "Fix unhandled exception\nFix serial port selection\nUpdate dependencies",
-                "de": "Nicht behandelte Ausnahme behoben\nKorrigieren Sie die Auswahl der seriellen Schnittstelle\nAbhängigkeiten aktualisieren",
-                "ru": "Исправить необработанное исключение\nИсправить выбор последовательного порта\nОбновить зависимости",
-                "pt": "Corrigir exceção não tratada\nCorrigir seleção de porta serial\nAtualizar dependências",
-                "nl": "Los onverwerkte uitzondering op\nFix seriële poortselectie\nUpdate afhankelijkheden",
-                "fr": "Correction d'une exception non gérée\nCorrection de la sélection du port série\nMettre à jour les dépendances",
-                "it": "Correzione dell'eccezione non gestita\nCorreggi la selezione della porta seriale\nAggiorna dipendenze",
-                "es": "Arreglar excepción no controlada\nFijar selección de puerto serie\nActualizar dependencias",
-                "pl": "Napraw nieobsługiwany wyjątek\nNapraw wybór portu szeregowego\nZaktualizuj zależności",
-                "zh-cn": "修复未处理的异常\n修复串口选择\n更新依赖"
-            },
-            "1.3.0": {
-                "en": "Support nodejs 12+14\nPrevent warnings in js-controller 3",
-                "de": "Unterstützt die Knoten 12 + 14\nVerhindern Sie Warnungen in js-controller 3",
-                "ru": "Поддержка nodejs 12 + 14\nПредотвратить предупреждения в js-controller 3",
-                "pt": "Suporte nodejs 12 + 14\nImpedir avisos no controlador js 3",
-                "nl": "Ondersteuning van nodejs 12 + 14\nVoorkom waarschuwingen in js-controller 3",
-                "fr": "Prise en charge de nodejs 12 + 14\nEmpêcher les avertissements dans js-controller 3",
-                "it": "Supporta nodejs 12 + 14\nPrevenire gli avvisi in js-controller 3",
-                "es": "Soporte nodejs 12 + 14\nEvitar advertencias en js-controller 3",
-                "pl": "Wspieraj nodejs 12 + 14\nZapobiegaj ostrzeżeniom w sterowniku js 3",
-                "zh-cn": "支持nodejs 12 + 14\n防止js-controller 3中的警告"
-            },
-            "1.2.0": {
-                "en": "Refactoring",
-                "de": "Refactoring",
-                "ru": "Рефакторинг",
-                "pt": "Reestruturação",
-                "nl": "refactoring",
-                "fr": "Refactoring",
-                "it": "refactoring",
-                "es": "Refactorización",
-                "pl": "Refaktoryzacja",
-                "zh-cn": "重构"
-            },
-            "1.1.2": {
-                "en": "User enabled pairingmode. Fixes and optimizations",
-                "de": "Vom Benutzer aktivierter Pairing-Modus. Korrekturen und Optimierungen",
-                "ru": "Пользователь включил режим сопряжения. Исправления и оптимизации",
-                "pt": "Modo de emparelhamento ativado pelo usuário. Correções e otimizações",
-                "nl": "Door de gebruiker ingeschakelde koppelingsmodus. Fixes en optimalisaties",
-                "fr": "Mode de couplage activé par l'utilisateur. Corrections et optimisations",
-                "it": "Modalità pairing abilitata dall'utente. Correzioni e ottimizzazioni",
-                "es": "Modo de emparejamiento habilitado por el usuario. Arreglos y optimizaciones",
-                "pl": "Tryb parowania włączony przez użytkownika. Poprawki i optymalizacje",
-                "zh-cn": "用户启用了pairingmode。修复和优化"
-            },
-            "1.1.1": {
-                "en": "fixes and optimizations",
-                "de": "Korrekturen und Optimierungen",
-                "ru": "исправления и оптимизации",
-                "pt": "correções e otimizações",
-                "nl": "fixes en optimalisaties",
-                "fr": "corrections et optimisations",
-                "it": "correzioni e ottimizzazioni",
-                "es": "correcciones y optimizaciones",
-                "pl": "poprawki i optymalizacje",
-                "zh-cn": "修复和优化"
-            },
-            "1.1.0": {
-                "en": "nodejs 10 and 12 now supported, thermostat functions and configurations enhanced, error handling and polling optimized",
-                "de": "Die Knoten 10 und 12 werden jetzt unterstützt, Thermostatfunktionen und -konfigurationen verbessert, Fehlerbehandlung und Abfrage optimiert",
-                "ru": "Теперь поддерживаются ноды 10 и 12, улучшены функции и конфигурации термостата, оптимизирована обработка ошибок и опрос",
-                "pt": "o nodejs 10 e 12 agora suportados, funções e configurações do termostato aprimoradas, manipulação de erros e pesquisa otimizada",
-                "nl": "nodejs 10 en 12 worden nu ondersteund, thermostaatfuncties en -configuraties verbeterd, foutafhandeling en polling geoptimaliseerd",
-                "fr": "Les nœuds 10 et 12 sont maintenant pris en charge, les fonctions et les configurations du thermostat sont améliorées, la gestion des erreurs et la scrutation sont optimisées.",
-                "it": "nodejs 10 e 12 ora supportati, funzioni e configurazioni del termostato migliorate, gestione degli errori e polling ottimizzati",
-                "es": "Ahora se admiten los nodos 10 y 12, funciones y configuraciones de termostato mejoradas, manejo de errores y sondeo optimizados",
-                "pl": "Obsługiwane są teraz nodejs 10 i 12, rozszerzono funkcje i konfiguracje termostatu, zoptymalizowano obsługę błędów i odpytywanie",
-                "zh-cn": "现在支持nodejs 10和12，增强了恒温器功能和配置，优化了错误处理和轮询"
-            },
-            "1.0.0": {
-                "en": "Wall thermostat was added",
-                "de": "Wandthermostat wurde hinzugefügt",
-                "ru": "Настенный термостат был добавлен",
-                "pt": "Termostato de parede foi adicionado",
-                "nl": "Wandthermostaat is toegevoegd",
-                "fr": "Le thermostat mural a été ajouté",
-                "it": "È stato aggiunto il termostato a parete",
-                "es": "Se agregó termostato de pared",
-                "pl": "Dodano termostat ścienny"
-            },
-            "0.5.3": {
-                "en": "Optimize logic to send commands and scanning",
-                "de": "Logik zum Senden von Befehlen und zum Scannen optimieren",
-                "ru": "Оптимизация логики для отправки команд и сканирования",
-                "pt": "Otimize a lógica para enviar comandos e digitalizar",
-                "nl": "Optimaliseer logica om opdrachten te verzenden en te scannen",
-                "fr": "Optimiser la logique pour envoyer des commandes et numériser",
-                "it": "Ottimizza la logica per inviare comandi e scansione",
-                "es": "Optimizar la lógica para enviar comandos y escanear",
-                "pl": "Optymalizuj logikę, aby wysyłać polecenia i skanowanie"
-            },
-            "0.5.2": {
-                "en": "Several fixes in communication for nanoCul and Logic",
-                "de": "Mehrere Fehler in der Kommunikation für nanoCul und Logic",
-                "ru": "Несколько исправлений в общении для nanoCul и Logic",
-                "pt": "Várias correcções na comunicação para nanoCul e Logic",
-                "nl": "Verschillende oplossingen voor communicatie voor nanoCul en Logic",
-                "fr": "Plusieurs correctifs dans la communication pour nanoCul et Logic",
-                "it": "Diverse correzioni nella comunicazione per nanoCul e Logic",
-                "es": "Varias correcciones en la comunicación para nanoCul y Logic",
-                "pl": "Kilka poprawek w komunikacji dla nanoCul i Logic"
-            },
-            "0.5.0": {
-                "en": "Fix Serial data parsing, Admin3 ready",
-                "de": "Repariert Serial Data Parsing, Admin3 bereit",
-                "ru": "Исправить синтаксический анализ последовательных данных, готовность Admin3",
-                "pt": "Fixar análise de dados em série, Admin3 pronto",
-                "nl": "Lossen van seriële gegevens op, Admin3 gereed",
-                "fr": "Correction de l'analyse des données en série, Admin3 prêt",
-                "it": "Correzione dell'analisi dei dati seriali, pronto per Admin3",
-                "es": "Repara el análisis de datos en serie, listo para Admin3",
-                "pl": "Naprawiono szeregowe przetwarzanie danych, gotowe Admin3"
-            },
-            "0.4.1": {
-                "en": "Upgrade dependencies",
-                "de": "Abhängigkeiten aktualisiert",
-                "ru": "Upgrade dependencies"
-            },
-            "0.4.0": {
-                "en": "Upgrade Serialport and cul library",
-                "de": "Serialport und cul Bibliotheken aktualisiert",
-                "ru": "Upgrade Serialport and cul library"
-            },
-            "0.3.0": {
-                "en": "Fix control of thermostates",
-                "de": "Korrigiere die Steuerung von Thermostaten",
-                "ru": "Исправлено управление термостатами"
-            },
-            "0.2.3": {
-                "en": "Fix calculation of serial number\nAdd valve configuration",
-                "de": "Korrigiere die Berechnung von Serialnummer\nVentilkonfiguration hinzugefügt",
-                "ru": "Исправлен поиск серийного номера\nДобавлены настройки вентиля"
-            },
-            "0.2.0": {
-                "en": "Activate thermostat scanner",
-                "de": "Implementiere Thermostatskanner",
-                "ru": "Активирован опрос термостата"
-            },
-            "0.1.1": {
-                "en": "intial commit",
-                "de": "intial commit",
-                "ru": "intial commit"
-            }
-        },
-        "title": "max! CUL",
-        "titleLang": {
-            "en": "max! CUL",
-            "de": "max! CUL",
-            "ru": "max! CUL",
-            "pt": "max! CUL",
-            "nl": "max! CUL",
-            "fr": "max! CUL",
-            "it": "max! CUL",
-            "es": "max! CUL",
-            "pl": "max! CUL",
-            "uk": "max! CUL",
-            "zh-cn": "max! CUL"
-        },
-        "desc": {
-            "en": "Control max! devices over CUL stick",
-            "de": "Steuere max! Geräte mit CUL stick",
-            "ru": "Управляет устройствами max! при помощи CUL",
-            "pt": "Controle máximo! dispositivos sobre o stick CUL",
-            "nl": "Controle max! apparaten boven CUL-stick",
-            "fr": "Contrôle max! appareils sur bâton CUL",
-            "it": "Controllo max! dispositivi su CUL stick",
-            "es": "Control max! dispositivos sobre CUL stick",
-            "pl": "Kontrola max! urządzenia na sztyfcie CUL"
-        },
-        "platform": "javascript/Node.js",
-        "mode": "daemon",
-        "loglevel": "info",
-        "licenseInformation": {
-            "type": "free",
-            "license": "GPL-2.0-only"
-        },
-        "tier": 2,
-        "enabled": true,
-        "messagebox": true,
-        "adminUI": {
-            "config": "json"
-        },
-        "icon": "maxcul.png",
-        "compact": true,
-        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/admin/maxcul.png",
-        "keywords": [
-            "cul",
-            "MAX!",
-            "868",
-            "busware"
-        ],
-        "readme": "https://github.com/ioBroker/ioBroker.maxcul/blob/master/README.md",
-        "type": "iot-systems",
-        "authors": [
-            {
-                "name": "bluefox",
-                "email": "dogafox@gmail.com"
-            }
-        ]
+  "common": {
+    "name": "maxcul",
+    "version": "2.0.0",
+    "news": {
+      "2.0.0": {
+        "en": "Updating serialport to version 12.0.0 to support Node.js 20\nRefactoring and code cleanup",
+        "de": "Aktualisierung des seriellen Ports auf Version 12.0.0 zur Unterstützung von Node.js 20\nAufbereitung und Codereinigung",
+        "ru": "Обновление серийного порта до версии 12.0.0 для поддержки Node.js 20\nРефакторинг и очистка кода",
+        "pt": "Atualizando a porta serial para a versão 12.0.0 para suportar Node.js 20\nRefactoração e limpeza de código",
+        "nl": "Bijwerken van seriële poort naar versie 12.0.0 om Node.js 20 te ondersteunen\nRefactoring en code opruiming",
+        "fr": "Mise à jour du port série vers la version 12.0.0 pour soutenir Node.js 20\nRemise en état et nettoyage du code",
+        "it": "Aggiornamento della porta seriale alla versione 12.0.0 per supportare Node.js 20\nRefactoring e pulizia del codice",
+        "es": "Actualizar el puerto serie a la versión 12.0.0 para apoyar Node.js 20\nRefactorización y limpieza de códigos",
+        "pl": "Aktualizacja portu szeregowego do wersji 12.0.0 w celu wsparcia Node.js 20\nRefakturowanie i czyszczenie kodu",
+        "uk": "Оновлення серійного порту до версії 12.0.0 для підтримки Node.js 20\nВідновлення та очищення коду",
+        "zh-cn": "更新序列端口至12.0.0版本,支持Node.js 20\n重构和代码清理"
+      },
+      "1.3.2": {
+        "en": "Updating serialport to version 12.0.0 to support nodejs 20",
+        "de": "Aktualisierung von serialport auf Version 12.0.0 zur Unterstützung von nodejs 20",
+        "ru": "Обновление serialport до версии 12.0.0 для поддержки nodejs 20",
+        "pt": "Atualizando serialport para a versão 12.0.0 para suportar nodejs 20",
+        "nl": "Serialport bijwerken naar versie 12.0.0 om nodejs 20 te ondersteunen",
+        "fr": "Mise à jour de serialport vers la version 12.0.0 pour prendre en charge nodejs 20",
+        "it": "Aggiornamento di serialport alla versione 12.0.0 per supportare nodejs 20",
+        "es": "Actualizando serialport a la versión 12.0.0 para soportar nodejs 20",
+        "pl": "Aktualizacja serialport do wersji 12.0.0, aby obsługiwać nodejs 20",
+        "zh-cn": "将serialport更新到版本12.0.0以支持nodejs 20"
+      },
+      "1.3.1": {
+        "en": "Fix unhandled exception\nFix serial port selection\nUpdate dependencies",
+        "de": "Nicht behandelte Ausnahme behoben\nKorrigieren Sie die Auswahl der seriellen Schnittstelle\nAbhängigkeiten aktualisieren",
+        "ru": "Исправить необработанное исключение\nИсправить выбор последовательного порта\nОбновить зависимости",
+        "pt": "Corrigir exceção não tratada\nCorrigir seleção de porta serial\nAtualizar dependências",
+        "nl": "Los onverwerkte uitzondering op\nFix seriële poortselectie\nUpdate afhankelijkheden",
+        "fr": "Correction d'une exception non gérée\nCorrection de la sélection du port série\nMettre à jour les dépendances",
+        "it": "Correzione dell'eccezione non gestita\nCorreggi la selezione della porta seriale\nAggiorna dipendenze",
+        "es": "Arreglar excepción no controlada\nFijar selección de puerto serie\nActualizar dependencias",
+        "pl": "Napraw nieobsługiwany wyjątek\nNapraw wybór portu szeregowego\nZaktualizuj zależności",
+        "zh-cn": "修复未处理的异常\n修复串口选择\n更新依赖"
+      },
+      "1.3.0": {
+        "en": "Support nodejs 12+14\nPrevent warnings in js-controller 3",
+        "de": "Unterstützt die Knoten 12 + 14\nVerhindern Sie Warnungen in js-controller 3",
+        "ru": "Поддержка nodejs 12 + 14\nПредотвратить предупреждения в js-controller 3",
+        "pt": "Suporte nodejs 12 + 14\nImpedir avisos no controlador js 3",
+        "nl": "Ondersteuning van nodejs 12 + 14\nVoorkom waarschuwingen in js-controller 3",
+        "fr": "Prise en charge de nodejs 12 + 14\nEmpêcher les avertissements dans js-controller 3",
+        "it": "Supporta nodejs 12 + 14\nPrevenire gli avvisi in js-controller 3",
+        "es": "Soporte nodejs 12 + 14\nEvitar advertencias en js-controller 3",
+        "pl": "Wspieraj nodejs 12 + 14\nZapobiegaj ostrzeżeniom w sterowniku js 3",
+        "zh-cn": "支持nodejs 12 + 14\n防止js-controller 3中的警告"
+      },
+      "1.2.0": {
+        "en": "Refactoring",
+        "de": "Refactoring",
+        "ru": "Рефакторинг",
+        "pt": "Reestruturação",
+        "nl": "refactoring",
+        "fr": "Refactoring",
+        "it": "refactoring",
+        "es": "Refactorización",
+        "pl": "Refaktoryzacja",
+        "zh-cn": "重构"
+      },
+      "1.1.2": {
+        "en": "User enabled pairingmode. Fixes and optimizations",
+        "de": "Vom Benutzer aktivierter Pairing-Modus. Korrekturen und Optimierungen",
+        "ru": "Пользователь включил режим сопряжения. Исправления и оптимизации",
+        "pt": "Modo de emparelhamento ativado pelo usuário. Correções e otimizações",
+        "nl": "Door de gebruiker ingeschakelde koppelingsmodus. Fixes en optimalisaties",
+        "fr": "Mode de couplage activé par l'utilisateur. Corrections et optimisations",
+        "it": "Modalità pairing abilitata dall'utente. Correzioni e ottimizzazioni",
+        "es": "Modo de emparejamiento habilitado por el usuario. Arreglos y optimizaciones",
+        "pl": "Tryb parowania włączony przez użytkownika. Poprawki i optymalizacje",
+        "zh-cn": "用户启用了pairingmode。修复和优化"
+      },
+      "1.1.1": {
+        "en": "fixes and optimizations",
+        "de": "Korrekturen und Optimierungen",
+        "ru": "исправления и оптимизации",
+        "pt": "correções e otimizações",
+        "nl": "fixes en optimalisaties",
+        "fr": "corrections et optimisations",
+        "it": "correzioni e ottimizzazioni",
+        "es": "correcciones y optimizaciones",
+        "pl": "poprawki i optymalizacje",
+        "zh-cn": "修复和优化"
+      }
     },
-    "native": {
-        "serialport": "",
-        "baudrate": 38400,
-        "baseAddress": "123456",
-        "scanner": 0,
-        "pairMode": false
+    "title": "max! CUL",
+    "titleLang": {
+      "en": "max! CUL",
+      "de": "max! CUL",
+      "ru": "max! CUL",
+      "pt": "max! CUL",
+      "nl": "max! CUL",
+      "fr": "max! CUL",
+      "it": "max! CUL",
+      "es": "max! CUL",
+      "pl": "max! CUL",
+      "uk": "max! CUL",
+      "zh-cn": "max! CUL"
     },
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "If connected to CUL",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.enablePairingMode",
-            "type": "state",
-            "common": {
-                "role": "indicator",
-                "name": "enable pairing mode for 30 seconds",
-                "type": "boolean",
-                "read": true,
-                "write": true,
-                "def": false
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.limitOverflow",
-            "type": "state",
-            "common": {
-                "role": "indicator",
-                "name": "Send limit overflow",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.quota",
-            "type": "state",
-            "common": {
-                "role": "state",
-                "name": "Send quota",
-                "type": "number",
-                "read": true,
-                "write": false
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.version",
-            "type": "state",
-            "common": {
-                "role": "state",
-                "name": "CUL firmware version",
-                "type": "string",
-                "read": true,
-                "write": false
-            },
-            "native": {}
-        }
+    "desc": {
+      "en": "Control max! devices over CUL stick",
+      "de": "Steuere max! Geräte mit CUL stick",
+      "ru": "Управляет устройствами max! при помощи CUL",
+      "pt": "Controle máximo! dispositivos sobre o stick CUL",
+      "nl": "Controle max! apparaten boven CUL-stick",
+      "fr": "Contrôle max! appareils sur bâton CUL",
+      "it": "Controllo max! dispositivi su CUL stick",
+      "es": "Control max! dispositivos sobre CUL stick",
+      "pl": "Kontrola max! urządzenia na sztyfcie CUL"
+    },
+    "platform": "javascript/Node.js",
+    "mode": "daemon",
+    "loglevel": "info",
+    "licenseInformation": {
+      "type": "free",
+      "license": "GPL-2.0-only"
+    },
+    "tier": 2,
+    "enabled": true,
+    "messagebox": true,
+    "adminUI": {
+      "config": "json"
+    },
+    "icon": "maxcul.png",
+    "compact": true,
+    "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.maxcul/master/admin/maxcul.png",
+    "keywords": [
+      "cul",
+      "MAX!",
+      "868",
+      "busware"
+    ],
+    "readme": "https://github.com/ioBroker/ioBroker.maxcul/blob/master/README.md",
+    "type": "iot-systems",
+    "authors": [
+      {
+        "name": "bluefox",
+        "email": "dogafox@gmail.com"
+      }
     ]
+  },
+  "native": {
+    "serialport": "",
+    "baudrate": 38400,
+    "baseAddress": "123456",
+    "scanner": 0,
+    "pairMode": false
+  },
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "If connected to CUL",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.enablePairingMode",
+      "type": "state",
+      "common": {
+        "role": "indicator",
+        "name": "enable pairing mode for 30 seconds",
+        "type": "boolean",
+        "read": true,
+        "write": true,
+        "def": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.limitOverflow",
+      "type": "state",
+      "common": {
+        "role": "indicator",
+        "name": "Send limit overflow",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.quota",
+      "type": "state",
+      "common": {
+        "role": "state",
+        "name": "Send quota",
+        "type": "number",
+        "read": true,
+        "write": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.version",
+      "type": "state",
+      "common": {
+        "role": "state",
+        "name": "CUL firmware version",
+        "type": "string",
+        "read": true,
+        "write": false
+      },
+      "native": {}
+    }
+  ]
 }
