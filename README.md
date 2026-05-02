@@ -27,6 +27,9 @@ E.g. for thermostats press longer the "boost" button till the countdown will sta
     Placeholder for the next version (at the beginning of the line):
   ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22 now
+
 ### 2.0.0 (2026-02-25)
 * (9Mad-Max5) Updating serialport to version 12.0.0 to support Node.js 20
 * (@GermanBluefox) Refactoring and code cleanup
