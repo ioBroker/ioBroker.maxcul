@@ -90,6 +90,8 @@ E.g. for thermostats press longer the "boost" button till the countdown will sta
 ### 0.1.1 (2017-04-10)
 * (bluefox) intial commit
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 
 [Licensed under GPLv2](LICENSE) Copyright (c) 2017-2026 bluefox <dogafox@gmail.com>
