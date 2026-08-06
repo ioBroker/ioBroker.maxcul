@@ -143,6 +143,11 @@
         "name": "bluefox",
         "email": "dogafox@gmail.com"
       }
+    ],
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
     ]
   },
   "native": {
