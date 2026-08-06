@@ -36,7 +36,7 @@
         "@iobroker/types": "^7.2.2",
         "@types/node": "^22.20.1",
         "@types/sprintf-js": "^1.1.4",
-        "typescript": "~6.0.3"
+        "typescript": "~7.0.2"
     },
     "directories": {},
     "homepage": "https://github.com/ioBroker/ioBroker.maxcul",
