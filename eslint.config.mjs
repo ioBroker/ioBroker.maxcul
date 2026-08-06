@@ -1,3 +1,4 @@
+// ioBroker eslint template configuration file for js and ts files
 import config from '@iobroker/eslint-config';
 
 export default [
@@ -9,7 +10,6 @@ export default [
                     allow: ['*.js', '*.mjs'],
                 },
                 tsconfigRootDir: import.meta.dirname,
-                // project: './tsconfig.json',
             },
         },
     },
@@ -22,11 +22,6 @@ export default [
         },
     },
     {
-        ignores: [
-            'build/**/*',
-            'admin/**/*',
-            'test/**/*',
-            '**/*.mjs'
-        ],
+        ignores: ['build/**/*', 'admin/**/*', 'test/**/*', '**/*.mjs'],
     },
 ];

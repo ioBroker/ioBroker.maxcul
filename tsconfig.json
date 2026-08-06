@@ -2,13 +2,17 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
+        // do not compile anything; this file is just to configure type checking
+        // the compilation is configured in tsconfig.build.json
         "noEmit": true,
+        // check JS files, but do not compile them => tsconfig.build.json
         "allowJs": true,
         "checkJs": true,
 
         "skipLibCheck": true, // Don't report errors in 3rd party definitions
         "noEmitOnError": true,
         "outDir": "./build",
+        "rootDir": "./src",
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "module": "Node16",
@@ -22,6 +26,6 @@
         "useUnknownInCatchVariables": false,
         "types": ["node", "@iobroker/types"]
     },
-    "include": ["src/**/*.*", "src/**/*.d.*"],
+    "include": ["src/**/*.ts"],
     "exclude": ["build/**", "node_modules/**", "src-admin/**"]
 }
