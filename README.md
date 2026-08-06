@@ -29,10 +29,11 @@ E.g. for thermostats press longer the "boost" button till the countdown will sta
 -->
 
 ### **WORK IN PROGRESS**
-- (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
-
-### 2.0.0 (2026-02-25)
+* (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
 * (9Mad-Max5) Updating serialport to version 12.0.0 to support Node.js 20
+* (9Mad-Max5) Updating serialport to version 13.0.0 to support Node.js 20
+* (@GermanBluefox) Migrated the sources to TypeScript
+* (@GermanBluefox) Fixed the message counter, which was sent as `01` for every packet
 * (@GermanBluefox) Refactoring and code cleanup
 
 ### 1.3.1 (2020-07-26)
@@ -93,6 +94,8 @@ E.g. for thermostats press longer the "boost" button till the countdown will sta
 
 ### 0.1.1 (2017-04-10)
 * (bluefox) intial commit
+
+[Older changelogs can be found there](CHANGELOG_OLD.md)
 
 ## License
 
