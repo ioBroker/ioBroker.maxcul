@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "maxcul",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "news": {
+      "2.0.1": {
+        "en": "Adapter requires js-controller >= 6.0.11 now.\nUpdating serialport to version 12.0.0 to support Node.js 20\nUpdating serialport to version 13.0.0 to stop support for Node.js 20\nMigrated the sources to TypeScript\nFixed the message counter, which was sent as `01` for every packet\nRefactoring and code cleanup",
+        "de": "Der Adapter benötigt jetzt js-controller >= 6.0.11.\nSerialport wurde auf Version 12.0.0 aktualisiert, um Node.js 20 zu unterstützen.\nSerialport wird auf Version 13.0.0 aktualisiert, um die Unterstützung für Node.js 20 einzustellen.\nDie Quellen wurden nach TypeScript migriert.\nDer Nachrichtenzähler, der für jedes Paket als „01“ gesendet wurde, wurde korrigiert.\nRefactoring und Codebereinigung",
+        "ru": "Для работы адаптера теперь требуется js-controller версии не ниже 6.0.11.\nОбновление serialport до версии 12.0.0 для поддержки Node.js 20.\nОбновление serialport до версии 13.0.0 прекращает поддержку Node.js 20.\nПеренёс исходный код на TypeScript.\nИсправлен счетчик сообщений, который отправлялся как `01` для каждого пакета.\nРефакторинг и очистка кода",
+        "pt": "O adaptador agora requer js-controller >= 6.0.11.\nAtualizando o serialport para a versão 12.0.0 para oferecer suporte ao Node.js 20.\nAtualizando o serialport para a versão 13.0.0 para interromper o suporte ao Node.js 20.\nMigrei os códigos-fonte para TypeScript.\nCorrigido o contador de mensagens, que era enviado como `01` para cada pacote.\nRefatoração e limpeza de código",
+        "nl": "De adapter vereist nu js-controller >= 6.0.11.\nSeriële poort bijwerken naar versie 12.0.0 ter ondersteuning van Node.js 20.\nSeriële poort wordt bijgewerkt naar versie 13.0.0 om de ondersteuning voor Node.js 20 te stoppen.\nDe broncode is gemigreerd naar TypeScript.\nDe berichtenteller is gecorrigeerd; deze werd voor elk pakket als `01` verzonden.\nRefactoring en code opschonen",
+        "fr": "L'adaptateur requiert désormais js-controller >= 6.0.11.\nMise à jour de serialport vers la version 12.0.0 pour la prise en charge de Node.js 20\nMise à jour de serialport vers la version 13.0.0 pour arrêter la prise en charge de Node.js 20\nMigration des sources vers TypeScript\nLe compteur de messages a été corrigé ; il était envoyé sous la forme « 01 » pour chaque paquet.\nRefactorisation et nettoyage du code",
+        "it": "L'adattatore ora richiede js-controller >= 6.0.11.\nAggiornamento di serialport alla versione 12.0.0 per supportare Node.js 20\nAggiornamento di serialport alla versione 13.0.0 per interrompere il supporto per Node.js 20\nMigrazione dei sorgenti a TypeScript\nCorretto il contatore dei messaggi, che veniva inviato come `01` per ogni pacchetto\nRistrutturazione e pulizia del codice",
+        "es": "El adaptador ahora requiere js-controller >= 6.0.11.\nActualizando serialport a la versión 12.0.0 para admitir Node.js 20.\nActualizando serialport a la versión 13.0.0 para dejar de dar soporte a Node.js 20.\nSe migraron los archivos fuente a TypeScript.\nSe corrigió el contador de mensajes, que se enviaba como `01` para cada paquete.\nRefactorización y limpieza de código",
+        "pl": "Adapter wymaga teraz js-controller w wersji >= 6.0.11.\nAktualizacja portu szeregowego do wersji 12.0.0 w celu obsługi Node.js 20\nAktualizacja portu szeregowego do wersji 13.0.0 w celu zaprzestania obsługi Node.js 20\nPrzeniesiono źródła do TypeScript\nNaprawiono licznik wiadomości, który był wysyłany jako `01` dla każdego pakietu\nRefaktoryzacja i czyszczenie kodu",
+        "uk": "Адаптер тепер вимагає js-controller >= 6.0.11.\nОновлення послідовного порту до версії 12.0.0 для підтримки Node.js 20\nОновлення послідовного порту до версії 13.0.0 для припинення підтримки Node.js 20\nПеренесено вихідні коди на TypeScript\nВиправлено лічильник повідомлень, який надсилався як `01` для кожного пакета.\nРефакторинг та очищення коду",
+        "zh-cn": "适配器现在需要 js-controller >= 6.0.11。\n将 serialport 更新至 12.0.0 版本以支持 Node.js 20\n将 serialport 更新至 13.0.0 版本，以停止对 Node.js 20 的支持。\n已将源代码迁移到 TypeScript。\n修复了消息计数器，之前每个数据包的消息计数器都显示为“01”。\n重构和代码清理"
+      },
       "2.0.0": {
         "en": "Updating serialport to version 12.0.0 to support Node.js 20\nRefactoring and code cleanup",
         "de": "Aktualisierung des seriellen Ports auf Version 12.0.0 zur Unterstützung von Node.js 20\nAufbereitung und Codereinigung",
@@ -75,18 +88,6 @@
         "es": "Modo de emparejamiento habilitado por el usuario. Arreglos y optimizaciones",
         "pl": "Tryb parowania włączony przez użytkownika. Poprawki i optymalizacje",
         "zh-cn": "用户启用了pairingmode。修复和优化"
-      },
-      "1.1.1": {
-        "en": "fixes and optimizations",
-        "de": "Korrekturen und Optimierungen",
-        "ru": "исправления и оптимизации",
-        "pt": "correções e otimizações",
-        "nl": "fixes en optimalisaties",
-        "fr": "corrections et optimisations",
-        "it": "correzioni e ottimizzazioni",
-        "es": "correcciones y optimizaciones",
-        "pl": "poprawki i optymalizacje",
-        "zh-cn": "修复和优化"
       }
     },
     "title": "max! CUL",
