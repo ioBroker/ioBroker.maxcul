@@ -54,13 +54,6 @@
     "io-package.json",
     "LICENSE"
   ],
-  "maintainers": [
-    {
-      "name": "bluefox",
-      "email": "dogafox@gmail.com"
-    }
-  ],
-  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ioBroker/ioBroker.maxcul.git"

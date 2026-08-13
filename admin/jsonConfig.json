@@ -5,9 +5,11 @@
         "connectionType": {
             "type": "select",
             "label": "connectionType",
+            "xs": 12,
             "sm": 12,
             "md": 6,
             "lg": 4,
+            "xl": 4,
             "default": "serial",
             "options": [
                 { "label": "connectionSerial", "value": "serial" },
@@ -20,9 +22,11 @@
             "label": "serialPort",
             "command": "listUart",
             "jsonData": "{}",
+            "xs": 12,
             "sm": 12,
             "md": 6,
             "lg": 4,
+            "xl": 4,
             "manual": true,
             "alsoDependsOn": ["baudrate"],
             "hidden": "data.connectionType === 'network'",
@@ -31,9 +35,11 @@
         "baudrate": {
             "type": "select",
             "label": "baudRate",
+            "xs": 12,
             "sm": 12,
             "md": 6,
             "lg": 4,
+            "xl": 4,
             "hidden": "data.connectionType === 'network'",
             "options": [
                 { "label": "110", "value": 110 },
@@ -55,9 +61,11 @@
         "host": {
             "type": "text",
             "label": "host",
+            "xs": 12,
             "sm": 12,
             "md": 6,
             "lg": 4,
+            "xl": 4,
             "help": "hostHelp",
             "hidden": "data.connectionType !== 'network'",
             "validator": "data.connectionType !== 'network' || !!data.host",
@@ -70,9 +78,11 @@
             "min": 1,
             "max": 65535,
             "default": 2323,
+            "xs": 12,
             "sm": 12,
             "md": 6,
             "lg": 4,
+            "xl": 4,
             "help": "portHelp",
             "hidden": "data.connectionType !== 'network'",
             "newLine": true
@@ -81,9 +91,11 @@
             "type": "text",
             "label": "baseAddress",
             "maxLength": 6,
+            "xs": 12,
             "sm": 12,
             "md": 6,
             "lg": 4,
+            "xl": 4,
             "help": "baseAddressHelp",
             "validator": "data.baseAddress && /^[0-9a-fA-F]{6}$/.test(data.baseAddress)",
             "validatorErrorText": "baseAddressMustHave6HEX",
@@ -93,9 +105,11 @@
             "type": "number",
             "label": "scanInterval",
             "min": 0,
+            "xs": 12,
             "sm": 12,
             "md": 6,
             "lg": 4,
+            "xl": 4,
             "newLine": true
         }
     }

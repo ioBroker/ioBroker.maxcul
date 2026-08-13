@@ -16,31 +16,6 @@
         "uk": "Адаптер тепер вимагає js-controller >= 6.0.11.\nОновлення послідовного порту до версії 12.0.0 для підтримки Node.js 20\nОновлення послідовного порту до версії 13.0.0 для припинення підтримки Node.js 20\nПеренесено вихідні коди на TypeScript\nВиправлено лічильник повідомлень, який надсилався як `01` для кожного пакета.\nРефакторинг та очищення коду",
         "zh-cn": "适配器现在需要 js-controller >= 6.0.11。\n将 serialport 更新至 12.0.0 版本以支持 Node.js 20\n将 serialport 更新至 13.0.0 版本，以停止对 Node.js 20 的支持。\n已将源代码迁移到 TypeScript。\n修复了消息计数器，之前每个数据包的消息计数器都显示为“01”。\n重构和代码清理"
       },
-      "2.0.0": {
-        "en": "Updating serialport to version 12.0.0 to support Node.js 20\nRefactoring and code cleanup",
-        "de": "Aktualisierung des seriellen Ports auf Version 12.0.0 zur Unterstützung von Node.js 20\nAufbereitung und Codereinigung",
-        "ru": "Обновление серийного порта до версии 12.0.0 для поддержки Node.js 20\nРефакторинг и очистка кода",
-        "pt": "Atualizando a porta serial para a versão 12.0.0 para suportar Node.js 20\nRefactoração e limpeza de código",
-        "nl": "Bijwerken van seriële poort naar versie 12.0.0 om Node.js 20 te ondersteunen\nRefactoring en code opruiming",
-        "fr": "Mise à jour du port série vers la version 12.0.0 pour soutenir Node.js 20\nRemise en état et nettoyage du code",
-        "it": "Aggiornamento della porta seriale alla versione 12.0.0 per supportare Node.js 20\nRefactoring e pulizia del codice",
-        "es": "Actualizar el puerto serie a la versión 12.0.0 para apoyar Node.js 20\nRefactorización y limpieza de códigos",
-        "pl": "Aktualizacja portu szeregowego do wersji 12.0.0 w celu wsparcia Node.js 20\nRefakturowanie i czyszczenie kodu",
-        "uk": "Оновлення серійного порту до версії 12.0.0 для підтримки Node.js 20\nВідновлення та очищення коду",
-        "zh-cn": "更新序列端口至12.0.0版本,支持Node.js 20\n重构和代码清理"
-      },
-      "1.3.2": {
-        "en": "Updating serialport to version 12.0.0 to support nodejs 20",
-        "de": "Aktualisierung von serialport auf Version 12.0.0 zur Unterstützung von nodejs 20",
-        "ru": "Обновление serialport до версии 12.0.0 для поддержки nodejs 20",
-        "pt": "Atualizando serialport para a versão 12.0.0 para suportar nodejs 20",
-        "nl": "Serialport bijwerken naar versie 12.0.0 om nodejs 20 te ondersteunen",
-        "fr": "Mise à jour de serialport vers la version 12.0.0 pour prendre en charge nodejs 20",
-        "it": "Aggiornamento di serialport alla versione 12.0.0 per supportare nodejs 20",
-        "es": "Actualizando serialport a la versión 12.0.0 para soportar nodejs 20",
-        "pl": "Aktualizacja serialport do wersji 12.0.0, aby obsługiwać nodejs 20",
-        "zh-cn": "将serialport更新到版本12.0.0以支持nodejs 20"
-      },
       "1.3.1": {
         "en": "Fix unhandled exception\nFix serial port selection\nUpdate dependencies",
         "de": "Nicht behandelte Ausnahme behoben\nKorrigieren Sie die Auswahl der seriellen Schnittstelle\nAbhängigkeiten aktualisieren",
@@ -51,6 +26,7 @@
         "it": "Correzione dell'eccezione non gestita\nCorreggi la selezione della porta seriale\nAggiorna dipendenze",
         "es": "Arreglar excepción no controlada\nFijar selección de puerto serie\nActualizar dependencias",
         "pl": "Napraw nieobsługiwany wyjątek\nNapraw wybór portu szeregowego\nZaktualizuj zależności",
+        "uk": "Виправлено необроблений виняток\nВиправлено вибір послідовного порту\nОновлено залежності",
         "zh-cn": "修复未处理的异常\n修复串口选择\n更新依赖"
       },
       "1.3.0": {
@@ -63,19 +39,8 @@
         "it": "Supporta nodejs 12 + 14\nPrevenire gli avvisi in js-controller 3",
         "es": "Soporte nodejs 12 + 14\nEvitar advertencias en js-controller 3",
         "pl": "Wspieraj nodejs 12 + 14\nZapobiegaj ostrzeżeniom w sterowniku js 3",
+        "uk": "Підтримка nodejs 12 + 14\nЗапобігання попередженням у js-controller 3",
         "zh-cn": "支持nodejs 12 + 14\n防止js-controller 3中的警告"
-      },
-      "1.2.0": {
-        "en": "Refactoring",
-        "de": "Refactoring",
-        "ru": "Рефакторинг",
-        "pt": "Reestruturação",
-        "nl": "refactoring",
-        "fr": "Refactoring",
-        "it": "refactoring",
-        "es": "Refactorización",
-        "pl": "Refaktoryzacja",
-        "zh-cn": "重构"
       },
       "1.1.2": {
         "en": "User enabled pairingmode. Fixes and optimizations",
@@ -87,10 +52,10 @@
         "it": "Modalità pairing abilitata dall'utente. Correzioni e ottimizzazioni",
         "es": "Modo de emparejamiento habilitado por el usuario. Arreglos y optimizaciones",
         "pl": "Tryb parowania włączony przez użytkownika. Poprawki i optymalizacje",
+        "uk": "Користувач увімкнув режим сполучення. Виправлення та оптимізації",
         "zh-cn": "用户启用了pairingmode。修复和优化"
       }
     },
-    "title": "max! CUL",
     "titleLang": {
       "en": "max! CUL",
       "de": "max! CUL",
@@ -113,11 +78,16 @@
       "fr": "Contrôle max! appareils sur bâton CUL",
       "it": "Controllo max! dispositivi su CUL stick",
       "es": "Control max! dispositivos sobre CUL stick",
-      "pl": "Kontrola max! urządzenia na sztyfcie CUL"
+      "pl": "Kontrola max! urządzenia na sztyfcie CUL",
+      "uk": "Керування пристроями max! через CUL-стік",
+      "zh-cn": "通过 CUL 棒控制 max! 设备"
     },
-    "platform": "javascript/Node.js",
+    "platform": "Javascript/Node.js",
     "mode": "daemon",
     "loglevel": "info",
+    "connectionType": "local",
+    "dataSource": "push",
+    "nogit": true,
     "licenseInformation": {
       "type": "free",
       "license": "GPL-2.0-only"
@@ -148,6 +118,11 @@
     "dependencies": [
       {
         "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.20"
       }
     ]
   },
@@ -187,7 +162,7 @@
       "_id": "info.enablePairingMode",
       "type": "state",
       "common": {
-        "role": "indicator",
+        "role": "switch.enable",
         "name": "enable pairing mode for 30 seconds",
         "type": "boolean",
         "read": true,

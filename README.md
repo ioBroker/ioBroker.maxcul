@@ -43,6 +43,8 @@ could not be sent meanwhile stay in the queue and are transmitted once the CUL i
 * (@GermanBluefox) Added support for CUN/CUNO devices which are connected over the network (TCP)
 * (@GermanBluefox) The connection is now re-established automatically if it was lost
 * (@GermanBluefox) Fixed the crash on a communication error and the missing cause in the connection error message
+* (@GermanBluefox) Fixed the CI workflow, which was not triggered by pushes to the master branch
+* (@GermanBluefox) Fixed the issues reported by the repository checker
 
 ### 2.0.1 (2026-08-06)
 * (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
@@ -72,4 +74,6 @@ could not be sent meanwhile stay in the queue and are transmitted once the CUL i
 
 ## License
 
-[Licensed under GPLv2](LICENSE) Copyright (c) 2017-2026 bluefox <dogafox@gmail.com>
+[Licensed under GPLv2](LICENSE)
+
+Copyright (c) 2017-2026 bluefox <dogafox@gmail.com>
