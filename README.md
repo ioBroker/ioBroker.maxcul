@@ -44,7 +44,7 @@ could not be sent meanwhile stay in the queue and are transmitted once the CUL i
     Placeholder for the next version (at the beginning of the line):
   ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 2.1.0 (2026-08-13)
 * (@GermanBluefox) Added support for CUN/CUNO devices which are connected over the network (TCP)
 * (@GermanBluefox) The connection is now re-established automatically if it was lost
 * (@GermanBluefox) Fixed the crash on a communication error and the missing cause in the connection error message
@@ -71,10 +71,6 @@ could not be sent meanwhile stay in the queue and are transmitted once the CUL i
 
 ### 1.2.0 (2020-01-23)
 * (bluefox) Refactoring
-
-### 1.1.2 (2019-08-28)
-* (Arne Stenmanns) user enabled paringmode
-* (bowao) fixes for measured value of the wallthermostat
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
