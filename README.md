@@ -31,6 +31,11 @@ The adapter talks to a CUL running [culfw](http://culfw.de/) either over a seria
   address and the TCP port culfw is listening on (2323 by default).
   A workaround with `ser2net`/`socat` is not needed anymore.
 
+If more than one serial device is attached, prefer one of the `/dev/serial/by-id/...` entries of the port
+list. Which device becomes `/dev/ttyUSB0` and which one `/dev/ttyUSB1` depends on the order in which they
+are detected and can change after a reboot, while the `by-id` name always points to the same stick.
+Any other path can be entered manually.
+
 If the connection is lost, the adapter reconnects automatically every 10 seconds. Commands which
 could not be sent meanwhile stay in the queue and are transmitted once the CUL is back.
 
@@ -43,6 +48,7 @@ could not be sent meanwhile stay in the queue and are transmitted once the CUL i
 * (@GermanBluefox) Added support for CUN/CUNO devices which are connected over the network (TCP)
 * (@GermanBluefox) The connection is now re-established automatically if it was lost
 * (@GermanBluefox) Fixed the crash on a communication error and the missing cause in the connection error message
+* (@GermanBluefox) The serial port list now also offers the stable device links below `/dev/serial`, so a stick can be selected by a name which does not change after a reboot
 * (@GermanBluefox) Fixed the CI workflow, which was not triggered by pushes to the master branch
 * (@GermanBluefox) Fixed the issues reported by the repository checker
 

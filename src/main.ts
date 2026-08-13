@@ -7,6 +7,9 @@
  *      GPL-2.0-only License
  *
  */
+import { readdir, realpath } from 'node:fs/promises';
+import { basename, join } from 'node:path';
+
 import { Adapter, type AdapterOptions } from '@iobroker/adapter-core';
 import { SerialPort } from 'serialport';
 
@@ -19,6 +22,12 @@ const WEEK_DAYS = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thur
 
 /** Numbers of the set points of one week profile day */
 const SET_POINTS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13'] as const;
+
+/**
+ * Directories which udev fills with stable symlinks to the attached serial devices.
+ * They only exist on Linux and only if at least one serial device is attached.
+ */
+const SERIAL_LINK_DIRS = ['/dev/serial/by-id', '/dev/serial/by-path'];
 
 /** One state which has to be read before a group of values can be sent to the device */
 interface StateToCollect {
@@ -274,6 +283,63 @@ export class MaxCulAdapter extends Adapter {
         }
     }
 
+    /**
+     * Collect the stable symlinks of the attached serial devices.
+     * Which name a device gets (`/dev/ttyUSB0`, `/dev/ttyUSB1`, ...) depends on the order in which the devices are
+     * detected and can therefore change with every reboot. The symlinks below `/dev/serial` always point to the
+     * same device and are the better choice if more than one serial device is attached.
+     */
+    private async listSerialLinks(): Promise<{ label: string; value: string }[]> {
+        const result: { label: string; value: string }[] = [];
+
+        for (const dir of SERIAL_LINK_DIRS) {
+            let names: string[];
+            try {
+                names = await readdir(dir);
+            } catch {
+                // The directory does not exist on Windows/macOS or if no serial device is attached
+                continue;
+            }
+
+            for (const name of names.sort()) {
+                const link = join(dir, name);
+                let target: string;
+                try {
+                    target = basename(await realpath(link));
+                } catch {
+                    // Dangling link of a device which has been unplugged in the meantime
+                    continue;
+                }
+                result.push({ label: `${name} → ${target}`, value: link });
+            }
+        }
+
+        return result;
+    }
+
+    /** Collect all serial ports the CUL could be attached to */
+    private async listUart(): Promise<{ label: string; value: string }[]> {
+        const result: { label: string; value: string }[] = [];
+
+        // Both sources are collected independently, so that the symlinks are still offered if the enumeration
+        // of the serial ports fails and vice versa
+        try {
+            const ports = await SerialPort.list();
+            this.log.info(`List of ports: ${JSON.stringify(ports)}`);
+            result.push(...ports.map(p => ({ label: p.path, value: p.path })));
+        } catch (err) {
+            this.log.error(`Error listing serial ports: ${err}`);
+        }
+
+        try {
+            result.push(...(await this.listSerialLinks()));
+        } catch (err) {
+            this.log.error(`Error listing the serial device links: ${err}`);
+        }
+
+        return result;
+    }
+
     private onMessage(obj: ioBroker.Message): void {
         if (!obj) {
             return;
@@ -281,12 +347,8 @@ export class MaxCulAdapter extends Adapter {
         switch (obj.command) {
             case 'listUart':
                 if (obj.callback) {
-                    SerialPort.list()
-                        .then(ports => {
-                            this.log.info(`List of ports: ${JSON.stringify(ports)}`);
-                            const result = ports.map(p => ({ label: p.path, value: p.path }));
-                            this.sendTo(obj.from, obj.command, result, obj.callback);
-                        })
+                    this.listUart()
+                        .then(result => this.sendTo(obj.from, obj.command, result, obj.callback))
                         .catch(err => {
                             this.log.error(`Error listing serial ports: ${err}`);
                             this.sendTo(obj.from, obj.command, [], obj.callback);
