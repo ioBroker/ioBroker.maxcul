@@ -1,9 +1,15 @@
 /** Configuration of the maxcul adapter. See `admin/jsonConfig.json` */
 export interface MaxCulAdapterConfig {
+    /** How the CUL is connected: `serial` for a CUL stick, `network` for a CUN/CUNO */
+    connectionType: 'serial' | 'network';
     /** Name/path of the serial port the CUL stick is attached to. `DEBUG` starts the adapter with simulated devices */
     serialport: string;
     /** Baud rate of the CUL stick */
     baudrate: number | string;
+    /** Host name or IP address of the CUN/CUNO. Only used if `connectionType` is `network` */
+    host: string;
+    /** TCP port culfw is listening on. Only used if `connectionType` is `network` */
+    port: number | string;
     /** 6 digit HEX address this adapter uses as "cube" address */
     baseAddress: string;
     /** Polling interval in minutes. 0 disables the polling */

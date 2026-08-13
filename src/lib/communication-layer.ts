@@ -1,7 +1,29 @@
 import { EventEmitter } from 'node:events';
+import { Socket } from 'node:net';
 import { ReadlineParser, SerialPort } from 'serialport';
 
 import type { CulPacket } from './culpacket';
+
+/** Time between two attempts to (re)open a connection which was lost or could not be opened */
+const RECONNECT_INTERVAL = 10000;
+
+/** How a CUL is connected to this host */
+export type CulConnectionOptions =
+    | {
+          /** CUL stick on a serial port */
+          type: 'serial';
+          /** Name/path of the serial port */
+          port: string;
+          baudrate: number;
+      }
+    | {
+          /** CUN/CUNO reachable over the network */
+          type: 'network';
+          /** Host name or IP address */
+          host: string;
+          /** TCP port culfw is listening on */
+          port: number;
+      };
 
 function delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -21,28 +43,188 @@ function promiseWithTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
     ]).finally(() => clearTimeout(timer));
 }
 
-function serialOpen(port: SerialPort): Promise<void> {
-    return new Promise((resolve, reject) => {
-        port.open(err => (err ? reject(err) : resolve()));
-    });
+/** Events every transport emits */
+interface CulTransportEvents {
+    /** One complete line received from the CUL. The line break is already stripped */
+    line: [line: string];
+    error: [error: Error];
+    close: [];
 }
 
-function serialClose(port: SerialPort): Promise<void> {
-    return new Promise((resolve, reject) => {
-        port.close(err => (err ? reject(err) : resolve()));
-    });
+/**
+ * Connection to a CUL. culfw talks the same line based protocol over a serial port and over TCP,
+ * so only opening, closing and writing differ between the implementations.
+ */
+abstract class CulTransport extends EventEmitter<CulTransportEvents> {
+    /** Human-readable name of the connection, used for logging */
+    public abstract readonly name: string;
+
+    private _parser: ReadlineParser | null = null;
+    private _pipedStream: NodeJS.ReadableStream | null = null;
+
+    /** True as long as data can be written */
+    public abstract get isOpen(): boolean;
+
+    public abstract open(): Promise<void>;
+
+    /** Close the connection. Resolves immediately if it is not open */
+    public abstract close(): Promise<void>;
+
+    public abstract write(data: string): Promise<void>;
+
+    /** Resolves as soon as everything written so far has left the send buffer */
+    public abstract drain(): Promise<void>;
+
+    /** Split the incoming bytes of `stream` into lines and emit them as `line` events */
+    protected pipeLines(stream: NodeJS.ReadableStream): void {
+        this.unpipeLines();
+        // The ReadlineParser is created with the default encoding `utf8` and therefore emits strings
+        const parser = new ReadlineParser({ delimiter: '\n' });
+        stream.pipe(parser);
+        parser.on('data', (line: string) => this.emit('line', line.replace(/\r/g, '')));
+        this._parser = parser;
+        this._pipedStream = stream;
+    }
+
+    /** Detach the parser of a previous connection, so that reconnecting does not deliver every line twice */
+    protected unpipeLines(): void {
+        if (!this._parser) {
+            return;
+        }
+        this._pipedStream?.unpipe(this._parser);
+        this._parser.removeAllListeners('data');
+        this._parser.destroy();
+        this._parser = null;
+        this._pipedStream = null;
+    }
 }
 
-function serialWrite(port: SerialPort, data: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        port.write(data, err => (err ? reject(err) : resolve()));
-    });
+/** CUL stick attached to a serial port */
+class SerialTransport extends CulTransport {
+    public readonly name: string;
+    private readonly _port: SerialPort;
+
+    constructor(path: string, baudRate: number) {
+        super();
+        this.name = `${path}@${baudRate}`;
+        this._port = new SerialPort({ path, baudRate, autoOpen: false });
+    }
+
+    public get isOpen(): boolean {
+        return this._port.isOpen;
+    }
+
+    public open(): Promise<void> {
+        this._port.removeAllListeners('error');
+        this._port.removeAllListeners('close');
+        this._port.on('error', error => this.emit('error', error));
+        this._port.on('close', () => this.emit('close'));
+        this.pipeLines(this._port);
+
+        return new Promise((resolve, reject) => {
+            this._port.open(err => (err ? reject(err) : resolve()));
+        });
+    }
+
+    public close(): Promise<void> {
+        this.unpipeLines();
+        if (!this._port.isOpen) {
+            return Promise.resolve();
+        }
+        return new Promise((resolve, reject) => {
+            this._port.close(err => (err ? reject(err) : resolve()));
+        });
+    }
+
+    public write(data: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this._port.write(data, err => (err ? reject(err) : resolve()));
+        });
+    }
+
+    public drain(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this._port.drain(err => (err ? reject(err) : resolve()));
+        });
+    }
 }
 
-function serialDrain(port: SerialPort): Promise<void> {
-    return new Promise((resolve, reject) => {
-        port.drain(err => (err ? reject(err) : resolve()));
-    });
+/** CUN/CUNO which exposes culfw over TCP */
+class TcpTransport extends CulTransport {
+    public readonly name: string;
+    private readonly _host: string;
+    private readonly _port: number;
+    private _socket: Socket | null = null;
+
+    constructor(host: string, port: number) {
+        super();
+        this.name = `${host}:${port}`;
+        this._host = host;
+        this._port = port;
+    }
+
+    public get isOpen(): boolean {
+        return this._socket?.readyState === 'open';
+    }
+
+    public open(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const socket = new Socket();
+            this._socket = socket;
+
+            // Detect a CUN/CUNO which silently went away, otherwise a half-open connection would never be noticed
+            socket.setKeepAlive(true, 30000);
+            // The MAX! protocol waits for acknowledgements, so the commands must not be delayed by Nagle's algorithm
+            socket.setNoDelay(true);
+
+            const onConnectError = (error: Error): void => {
+                socket.destroy();
+                if (this._socket === socket) {
+                    this._socket = null;
+                }
+                reject(error);
+            };
+
+            socket.once('error', onConnectError);
+
+            socket.connect(this._port, this._host, () => {
+                socket.off('error', onConnectError);
+                socket.on('error', error => this.emit('error', error));
+                socket.on('close', () => this.emit('close'));
+                this.pipeLines(socket);
+                resolve();
+            });
+        });
+    }
+
+    public close(): Promise<void> {
+        const socket = this._socket;
+        this._socket = null;
+        this.unpipeLines();
+
+        if (!socket || socket.destroyed) {
+            return Promise.resolve();
+        }
+        return new Promise(resolve => {
+            socket.once('close', () => resolve());
+            socket.destroy();
+        });
+    }
+
+    public write(data: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            if (!this._socket || this._socket.readyState !== 'open') {
+                reject(new Error('network connection is not open'));
+                return;
+            }
+            this._socket.write(data, err => (err ? reject(err) : resolve()));
+        });
+    }
+
+    public drain(): Promise<void> {
+        // The callback of `socket.write` already fires when the data has left the send buffer
+        return Promise.resolve();
+    }
 }
 
 /** Events emitted by the communication layer */
@@ -62,19 +244,19 @@ export interface CommunicationServiceLayerEvents {
     gotAck: [];
 }
 
-/** Transport layer which talks to the CUL stick over the serial port */
+/** Transport layer which talks to the CUL over a serial port or over the network */
 export class CommunicationServiceLayer extends EventEmitter<CommunicationServiceLayerEvents> {
     private readonly logger: ioBroker.Logger;
     private readonly _baseAddress: string;
-    public readonly serialPortName: string;
+    /** Name of the connection as it is shown in the log */
+    public readonly connectionName: string;
     public ready = false;
 
-    private readonly _serialDeviceInstance: SerialPort;
-    private _serialDeviceParser: ReadlineParser | null = null;
+    private readonly _transport: CulTransport;
 
     /** Packets waiting to be transmitted */
     private readonly _messageQueue: CulPacket[] = [];
-    /** Raw commands waiting to be written to the serial port */
+    /** Raw commands waiting to be written to the CUL */
     private readonly _queuedWrites: string[] = [];
     private _queueSendInProgress = false;
     private _current: CulPacket | null = null;
@@ -82,143 +264,212 @@ export class CommunicationServiceLayer extends EventEmitter<CommunicationService
     private _ackResolver: (() => void) | null = null;
     private _currentSentPromise: Promise<void> | null = null;
     private _credits = 0;
+    private _reconnectTimer: NodeJS.Timeout | null = null;
+    /** True while `connect` is running, so that two connection attempts cannot overlap */
+    private _connecting = false;
+    /** True after `disconnect` was called, so that no reconnect is scheduled anymore */
+    private _closedByUser = false;
 
-    constructor(logger: ioBroker.Logger, baudrate: number, serialPortName: string, baseAddress: string) {
+    constructor(logger: ioBroker.Logger, connection: CulConnectionOptions, baseAddress: string) {
         super();
         this.logger = logger;
         this._baseAddress = baseAddress;
-        this.serialPortName = serialPortName;
-        this.logger.info(`using serial device ${this.serialPortName}@${baudrate}`);
-        this._serialDeviceInstance = new SerialPort({
-            path: serialPortName,
-            baudRate: baudrate,
-            autoOpen: false,
+
+        if (connection.type === 'network') {
+            this._transport = new TcpTransport(connection.host, connection.port);
+            this.connectionName = this._transport.name;
+            this.logger.info(`using network device ${this.connectionName}`);
+        } else {
+            this._transport = new SerialTransport(connection.port, connection.baudrate);
+            this.connectionName = this._transport.name;
+            this.logger.info(`using serial device ${this.connectionName}`);
+        }
+
+        this._transport.on('line', line => this.handleLine(line));
+
+        this._transport.on('error', error => {
+            this.logger.error(`communication error on ${this.connectionName}: ${error.message}`);
+            // Emitting `error` without a listener would throw, and a connection error must not kill the adapter
+            if (this.listenerCount('error')) {
+                this.emit('error', error);
+            }
+        });
+
+        this._transport.on('close', () => {
+            this.ready = false;
+            this.emit('close');
+            if (!this._closedByUser) {
+                this.logger.info(`connection to ${this.connectionName} was closed`);
+                this.scheduleReconnect();
+            }
         });
     }
 
-    public connect(): Promise<void> {
+    /** Handle one line received from the CUL */
+    private handleLine(line: string): void {
+        if (/^\d+\s+\d+$/.test(line)) {
+            const m = line.match(/^(\d+)\s+(\d+)$/);
+            if (m) {
+                this._credits = parseInt(m[2], 10);
+                try {
+                    this.emit('creditsReceived', m[2], m[1]);
+                } catch (error) {
+                    this.logger.error(`Error in maxcul.js 'creditsReceived' : ${error} | Raw data from CUL: ${line}`);
+                }
+            }
+            return;
+        }
+
+        this.logger.debug(`incoming raw data from CUL: ${line}`);
+
+        if (/^V(.*)/.test(line)) {
+            this.emit('culFirmwareVersion', line);
+            this.ready = true;
+            this.emit('ready');
+        } else if (/^Z(.*)/.test(line)) {
+            try {
+                this.emit('culDataReceived', line);
+            } catch (error) {
+                this.logger.error(`Error in maxcul.js 'culDataReceived' : ${error} | Raw data from CUL: ${line}`);
+            }
+        } else if (/^LOVF/.test(line)) {
+            try {
+                this.emit('LOVF', true);
+            } catch (error) {
+                this.logger.error(`Error in maxcul.js 'LOVF' : ${error} | Raw data from CUL: ${line}`);
+            }
+        } else {
+            this.logger.info(`received unknown data: ${line}`);
+        }
+    }
+
+    /** Try to open the connection again after `RECONNECT_INTERVAL` */
+    private scheduleReconnect(): void {
+        if (this._closedByUser || this._reconnectTimer) {
+            return;
+        }
+        this.logger.info(`Trying to connect to ${this.connectionName} again in ${RECONNECT_INTERVAL / 1000} seconds`);
+        this._reconnectTimer = setTimeout(() => {
+            this._reconnectTimer = null;
+            this.connect().catch(err => this.logger.error(`Cannot reconnect to ${this.connectionName}: ${err}`));
+        }, RECONNECT_INTERVAL);
+    }
+
+    public async connect(): Promise<void> {
+        if (this._connecting) {
+            // Another attempt is still running. Try again after it has finished
+            this.logger.debug(`Connect to ${this.connectionName} is already in progress`);
+            this.scheduleReconnect();
+            return;
+        }
+
+        this._connecting = true;
+        try {
+            await this.openAndInitialize();
+        } finally {
+            this._connecting = false;
+        }
+    }
+
+    private async openAndInitialize(): Promise<void> {
         this.ready = false;
-        this._serialDeviceInstance.removeAllListeners('error');
-        this._serialDeviceInstance.removeAllListeners('data');
-        this._serialDeviceInstance.removeAllListeners('close');
+        this._closedByUser = false;
+        if (this._reconnectTimer) {
+            clearTimeout(this._reconnectTimer);
+            this._reconnectTimer = null;
+        }
+
         this.removeAllListeners('newPacketForTransmission');
         this.removeAllListeners('readyForNextPacketTransmission');
-
-        this._serialDeviceParser = this._serialDeviceInstance.pipe(new ReadlineParser({ delimiter: '\n' }));
-
-        this._serialDeviceInstance.on('error', error => {
-            this.emit('error', error);
-            this.logger.error(`serialport communication error ${error}`);
-        });
-
-        this._serialDeviceInstance.on('close', () => {
-            this.emit('close');
-            this.removeAllListeners('newPacketForTransmission');
-            this.removeAllListeners('readyForNextPacketTransmission');
-        });
-
         this.on('newPacketForTransmission', () => this.processMessageQueue());
         this.on('readyForNextPacketTransmission', () => this.processMessageQueue());
 
-        return serialOpen(this._serialDeviceInstance)
-            .then(async () => {
-                const timeout = 30000;
-                this.logger.info(`serialPort ${this.serialPortName} is open!`);
+        try {
+            await this._transport.open();
+        } catch (err) {
+            this.logger.error(
+                `Can not connect to ${this.connectionName}, cause: ${err instanceof Error ? err.message : err}`,
+            );
+            this.scheduleReconnect();
+            return;
+        }
 
-                // The ReadlineParser is created with the default encoding `utf8` and therefore emits strings
-                this._serialDeviceParser?.on('data', (data: string) => {
-                    const dataString = data.replace(/\r/g, '');
+        this.logger.info(`${this.connectionName} is open!`);
 
-                    if (/^\d+\s+\d+$/.test(dataString)) {
-                        const m = dataString.match(/^(\d+)\s+(\d+)$/);
-                        if (m) {
-                            this._credits = parseInt(m[2], 10);
-                            try {
-                                this.emit('creditsReceived', m[2], m[1]);
-                            } catch (error) {
-                                this.logger.error(
-                                    `Error in maxcul.js 'creditsReceived' : ${error} | Raw data from CUL: ${data}`,
-                                );
-                            }
-                        }
-                        return;
-                    }
+        // Wait for the version answer of the CUL, but stop waiting if the connection is gone again
+        let settle: (() => void) | null = null;
+        const connectionSettled = new Promise<void>(resolve => {
+            settle = resolve;
+        });
+        const onSettled = (): void => settle?.();
+        this.on('ready', onSettled);
+        this.on('close', onSettled);
 
-                    this.logger.debug(`incoming raw data from CUL: ${data}`);
+        try {
+            await delay(2000);
+            this.logger.debug('check CUL Firmware version');
+            await this._transport.write('V\n');
+            this.logger.debug('Requested CUL Version...');
 
-                    if (/^V(.*)/.test(dataString)) {
-                        this.emit('culFirmwareVersion', dataString);
-                        this.ready = true;
-                        this.emit('ready');
-                    } else if (/^Z(.*)/.test(dataString)) {
-                        try {
-                            this.emit('culDataReceived', dataString);
-                        } catch (error) {
-                            this.logger.error(
-                                `Error in maxcul.js 'culDataReceived' : ${error} | Raw data from CUL: ${data}`,
-                            );
-                        }
-                    } else if (/^LOVF/.test(dataString)) {
-                        try {
-                            this.emit('LOVF', true);
-                        } catch (error) {
-                            this.logger.error(`Error in maxcul.js 'LOVF' : ${error} | Raw data from CUL: ${data}`);
-                        }
-                    } else {
-                        this.logger.info(`received unknown data: ${dataString}`);
-                    }
-                });
+            await delay(4000);
+            this.logger.debug('enable MAX! Mode of the CUL868');
+            await this._transport.write('X20\n');
+            this.logger.debug('X20 written');
+            await this._transport.drain();
+            this.logger.debug('X20 drained');
+            await this._transport.write('Zr\n');
+            this.logger.debug('Zr written');
+            await this._transport.drain();
+            this.logger.debug('Zr drained');
+            await this._transport.write(`Za${this._baseAddress}\n`);
+            this.logger.debug('Za written');
+            await this._transport.drain();
+            this.logger.debug('Za drained');
+        } catch (err) {
+            this.logger.error(`Error during CUL initialization: ${err}`);
+        }
 
-                const readyPromise = new Promise<void>(resolve => {
-                    this.once('ready', () => resolve());
-                });
+        try {
+            await promiseWithTimeout(connectionSettled, 30000);
+        } catch (err: any) {
+            if (err.name === 'TimeoutError') {
+                this.logger.info('Timeout on CUL connect, cul is available but not responding');
+            }
+        } finally {
+            this.removeListener('ready', onSettled);
+            this.removeListener('close', onSettled);
+        }
 
-                try {
-                    await delay(2000);
-                    this.logger.debug('check CUL Firmware version');
-                    await serialWrite(this._serialDeviceInstance, 'V\n');
-                    this.logger.debug('Requested CUL Version...');
+        if (!this._transport.isOpen) {
+            return;
+        }
 
-                    await delay(4000);
-                    this.logger.debug('enable MAX! Mode of the CUL868');
-                    await serialWrite(this._serialDeviceInstance, 'X20\n');
-                    this.logger.debug('X20 written');
-                    await serialDrain(this._serialDeviceInstance);
-                    this.logger.debug('X20 drained');
-                    await serialWrite(this._serialDeviceInstance, 'Zr\n');
-                    this.logger.debug('Zr written');
-                    await serialDrain(this._serialDeviceInstance);
-                    this.logger.debug('Zr drained');
-                    await serialWrite(this._serialDeviceInstance, `Za${this._baseAddress}\n`);
-                    this.logger.debug('Za written');
-                    await serialDrain(this._serialDeviceInstance);
-                    this.logger.debug('Za drained');
-                } catch (err) {
-                    this.logger.error(`Error during CUL initialization: ${err}`);
-                }
-
-                try {
-                    await promiseWithTimeout(readyPromise, timeout);
-                } catch (err: any) {
-                    if (err.name === 'TimeoutError') {
-                        this.logger.info('Timeout on CUL connect, cul is available but not responding');
-                    }
-                }
-            })
-            .catch((err: any) => {
-                this.logger.info(`Can not connect to serial port, cause: ${err.cause}`);
-            });
+        // Continue with everything that was queued while the connection was down
+        if (this._queuedWrites.length && !this._queueSendInProgress) {
+            setImmediate(() => this.writeQueue().catch(() => {}));
+        }
+        this.emit('readyForNextPacketTransmission');
     }
 
-    public disconnect(): Promise<void> | false {
-        if (this._serialDeviceInstance.isOpen) {
-            return serialClose(this._serialDeviceInstance);
+    public disconnect(): Promise<void> {
+        this._closedByUser = true;
+        this.ready = false;
+        if (this._reconnectTimer) {
+            clearTimeout(this._reconnectTimer);
+            this._reconnectTimer = null;
         }
-        return false;
+        return this._transport.close();
     }
 
     public async writeQueue(): Promise<boolean> {
         if (!this._queuedWrites.length) {
+            return true;
+        }
+
+        if (!this._transport.isOpen) {
+            // Everything stays in the queue and is sent once the connection is back
+            this.logger.debug(`Postpone ${this._queuedWrites.length} queued commands, connection is not open`);
+            this._queueSendInProgress = false;
             return true;
         }
 
@@ -239,7 +490,7 @@ export class CommunicationServiceLayer extends EventEmitter<CommunicationService
         }
 
         try {
-            await serialWrite(this._serialDeviceInstance, command);
+            await this._transport.write(command);
         } catch (err) {
             this.logger.error(` Error on Write ${command}: ${err}`);
             setImmediate(() => this.writeQueue().catch(() => {}));
@@ -249,13 +500,13 @@ export class CommunicationServiceLayer extends EventEmitter<CommunicationService
 
         let drainError = false;
         try {
-            await serialDrain(this._serialDeviceInstance);
+            await this._transport.drain();
         } catch (err) {
-            this.logger.debug(`serial port buffer could not been drained (from ${command.trim()}): ${err}`);
+            this.logger.debug(`send buffer could not been drained (from ${command.trim()}): ${err}`);
             drainError = true;
         }
         if (!drainError) {
-            this.logger.debug(`serial port buffer have been drained (from ${command.trim()})`);
+            this.logger.debug(`send buffer have been drained (from ${command.trim()})`);
         }
 
         this.logger.debug(`Send Packet to CUL: Wait ${delayMs} after sending ${command.trim()}`);
@@ -274,19 +525,19 @@ export class CommunicationServiceLayer extends EventEmitter<CommunicationService
     }
 
     public serialWrite(data: string): Promise<void> {
-        if (this._serialDeviceInstance.isOpen) {
+        if (this._transport.isOpen) {
             return this.enqueueWrite(`Zs${data}\n`);
         }
-        this.logger.debug('Can not send packet because serial port is not open');
-        return Promise.reject(new Error('Error: serial port is not open'));
+        this.logger.debug('Can not send packet because the connection is not open');
+        return Promise.reject(new Error(`Error: connection to ${this.connectionName} is not open`));
     }
 
     public serialRawWrite(data: string): Promise<void> {
-        if (this._serialDeviceInstance.isOpen) {
+        if (this._transport.isOpen) {
             return this.enqueueWrite(`${data}\n`);
         }
-        this.logger.debug('Can not send packet because serial port is not open');
-        return Promise.reject(new Error('Error: serial port is not open'));
+        this.logger.debug('Can not send packet because the connection is not open');
+        return Promise.reject(new Error(`Error: connection to ${this.connectionName} is not open`));
     }
 
     private enqueueWrite(command: string): Promise<void> {

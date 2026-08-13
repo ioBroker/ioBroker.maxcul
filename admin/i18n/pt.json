@@ -7,6 +7,13 @@
     "scanInterval": "Intervalo de varredura (minutos)",
     "selectPort": "Selecione a porta",
     "noPortsFound": "Nenhuma porta encontrada",
-    "notAvailable": "Não disponível"
+    "notAvailable": "Não disponível",
+    "connectionType": "Tipo de conexão",
+    "connectionSerial": "Pendrive CUL (porta serial)",
+    "connectionNetwork": "CUN/CUNO (rede)",
+    "host": "Nome do host ou endereço IP",
+    "hostHelp": "Nome do host ou endereço IP do CUN/CUNO",
+    "hostIsRequired": "O nome do host ou endereço IP é obrigatório",
+    "port": "Porta",
+    "portHelp": "Porta TCP na qual o culfw está escutando (padrão 2323)"
 }
-

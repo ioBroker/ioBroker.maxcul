@@ -22,11 +22,28 @@ Adapter is derived from [pimatic-maxcul](https://github.com/fbeek/pimatic-maxcul
 Before using you must first pair the devcies with ioBroker.
 E.g. for thermostats press longer the "boost" button till the countdown will start.
 
+## Connection
+The adapter talks to a CUL running [culfw](http://culfw.de/) either over a serial port or over the network:
+
+- **CUL stick (serial port)** - a CUL/COC attached via USB. Select the serial port and the baud rate.
+- **CUN/CUNO (network)** - a CUN, CUNO or any other culfw device which is reachable over TCP,
+  e.g. a MAX! Cube reflashed with culfw or an ESP8266/CC1101 bridge. Enter the host name or IP
+  address and the TCP port culfw is listening on (2323 by default).
+  A workaround with `ser2net`/`socat` is not needed anymore.
+
+If the connection is lost, the adapter reconnects automatically every 10 seconds. Commands which
+could not be sent meanwhile stay in the queue and are transmitted once the CUL is back.
+
 ## Changelog
 <!--
     Placeholder for the next version (at the beginning of the line):
   ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (@GermanBluefox) Added support for CUN/CUNO devices which are connected over the network (TCP)
+* (@GermanBluefox) The connection is now re-established automatically if it was lost
+* (@GermanBluefox) Fixed the crash on a communication error and the missing cause in the connection error message
+
 ### 2.0.1 (2026-08-06)
 * (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
 * (9Mad-Max5) Updating serialport to version 12.0.0 to support Node.js 20

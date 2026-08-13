@@ -7,6 +7,13 @@
     "scanInterval": "Scaninterval (minuten)",
     "selectPort": "Selecteer poort",
     "noPortsFound": "Geen poorten gevonden",
-    "notAvailable": "Niet beschikbaar"
+    "notAvailable": "Niet beschikbaar",
+    "connectionType": "Verbindingstype",
+    "connectionSerial": "CUL-stick (seriële poort)",
+    "connectionNetwork": "CUN/CUNO (netwerk)",
+    "host": "Hostnaam of IP-adres",
+    "hostHelp": "Hostnaam of IP-adres van de CUN/CUNO",
+    "hostIsRequired": "Hostnaam of IP-adres is verplicht",
+    "port": "Poort",
+    "portHelp": "TCP-poort waarop culfw luistert (standaard 2323)"
 }
-

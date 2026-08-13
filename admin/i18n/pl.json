@@ -7,6 +7,13 @@
     "scanInterval": "Interwał skanowania (minuty)",
     "selectPort": "Wybierz port",
     "noPortsFound": "Nie znaleziono portów",
-    "notAvailable": "Niedostępne"
+    "notAvailable": "Niedostępne",
+    "connectionType": "Typ połączenia",
+    "connectionSerial": "Stick CUL (port szeregowy)",
+    "connectionNetwork": "CUN/CUNO (sieć)",
+    "host": "Nazwa hosta lub adres IP",
+    "hostHelp": "Nazwa hosta lub adres IP urządzenia CUN/CUNO",
+    "hostIsRequired": "Nazwa hosta lub adres IP jest wymagana",
+    "port": "Port",
+    "portHelp": "Port TCP, na którym nasłuchuje culfw (domyślnie 2323)"
 }
-

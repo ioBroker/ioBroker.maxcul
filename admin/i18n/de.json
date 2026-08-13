@@ -5,7 +5,15 @@
     "baseAddressHelp": "6-stellige HEX-Adresse",
     "baseAddressMustHave6HEX": "Die Basisadresse muss 6 HEX-Symbole haben",
     "scanInterval": "Skanintervall (Minuten)",
-    "selectPort": "Port ausw\u00e4hlen",
+    "selectPort": "Port auswählen",
     "noPortsFound": "Keine Ports gefunden",
-    "notAvailable": "Nicht verf\u00fcgbar"
+    "notAvailable": "Nicht verfügbar",
+    "connectionType": "Verbindungsart",
+    "connectionSerial": "CUL-Stick (serielle Schnittstelle)",
+    "connectionNetwork": "CUN/CUNO (Netzwerk)",
+    "host": "Hostname oder IP-Adresse",
+    "hostHelp": "Hostname oder IP-Adresse des CUN/CUNO",
+    "hostIsRequired": "Hostname oder IP-Adresse wird benötigt",
+    "port": "Port",
+    "portHelp": "TCP-Port, auf dem culfw lauscht (Standard 2323)"
 }

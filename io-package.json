@@ -152,8 +152,11 @@
     ]
   },
   "native": {
+    "connectionType": "serial",
     "serialport": "",
     "baudrate": 38400,
+    "host": "",
+    "port": 2323,
     "baseAddress": "123456",
     "scanner": 0,
     "pairMode": false

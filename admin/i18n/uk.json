@@ -7,6 +7,13 @@
     "scanInterval": "Інтервал сканування (хвилини)",
     "selectPort": "Виберіть порт",
     "noPortsFound": "Порти не знайдені",
-    "notAvailable": "Недоступно"
+    "notAvailable": "Недоступно",
+    "connectionType": "Тип підключення",
+    "connectionSerial": "CUL-стік (послідовний порт)",
+    "connectionNetwork": "CUN/CUNO (мережа)",
+    "host": "Ім'я хоста або IP-адреса",
+    "hostHelp": "Ім'я хоста або IP-адреса CUN/CUNO",
+    "hostIsRequired": "Потрібно вказати ім'я хоста або IP-адресу",
+    "port": "Порт",
+    "portHelp": "TCP-порт, який прослуховує culfw (за замовчуванням 2323)"
 }
-

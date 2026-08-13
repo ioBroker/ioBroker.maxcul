@@ -2,6 +2,19 @@
     "i18n": true,
     "type": "panel",
     "items": {
+        "connectionType": {
+            "type": "select",
+            "label": "connectionType",
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "default": "serial",
+            "options": [
+                { "label": "connectionSerial", "value": "serial" },
+                { "label": "connectionNetwork", "value": "network" }
+            ],
+            "newLine": true
+        },
         "serialport": {
             "type": "selectSendTo",
             "label": "serialPort",
@@ -12,6 +25,7 @@
             "lg": 4,
             "manual": true,
             "alsoDependsOn": ["baudrate"],
+            "hidden": "data.connectionType === 'network'",
             "newLine": true
         },
         "baudrate": {
@@ -20,6 +34,7 @@
             "sm": 12,
             "md": 6,
             "lg": 4,
+            "hidden": "data.connectionType === 'network'",
             "options": [
                 { "label": "110", "value": 110 },
                 { "label": "150", "value": 150 },
@@ -35,6 +50,31 @@
                 { "label": "57600", "value": 57600 },
                 { "label": "115200", "value": 115200 }
             ],
+            "newLine": true
+        },
+        "host": {
+            "type": "text",
+            "label": "host",
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "help": "hostHelp",
+            "hidden": "data.connectionType !== 'network'",
+            "validator": "data.connectionType !== 'network' || !!data.host",
+            "validatorErrorText": "hostIsRequired",
+            "newLine": true
+        },
+        "port": {
+            "type": "number",
+            "label": "port",
+            "min": 1,
+            "max": 65535,
+            "default": 2323,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "help": "portHelp",
+            "hidden": "data.connectionType !== 'network'",
             "newLine": true
         },
         "baseAddress": {
@@ -60,4 +100,3 @@
         }
     }
 }
-

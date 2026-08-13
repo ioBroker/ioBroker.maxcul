@@ -7,6 +7,13 @@
     "scanInterval": "Intervalle de balayage (minutes)",
     "selectPort": "Sélectionnez un port",
     "noPortsFound": "Aucun port trouvé",
-    "notAvailable": "Non disponible"
+    "notAvailable": "Non disponible",
+    "connectionType": "Type de connexion",
+    "connectionSerial": "Clé CUL (port série)",
+    "connectionNetwork": "CUN/CUNO (réseau)",
+    "host": "Nom d'hôte ou adresse IP",
+    "hostHelp": "Nom d'hôte ou adresse IP du CUN/CUNO",
+    "hostIsRequired": "Le nom d'hôte ou l'adresse IP est obligatoire",
+    "port": "Port",
+    "portHelp": "Port TCP sur lequel culfw écoute (2323 par défaut)"
 }
-

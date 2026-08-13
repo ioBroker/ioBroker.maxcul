@@ -7,6 +7,13 @@
     "scanInterval": "扫描间隔（分钟）",
     "selectPort": "选择端口",
     "noPortsFound": "未找到端口",
-    "notAvailable": "不可用"
+    "notAvailable": "不可用",
+    "connectionType": "连接类型",
+    "connectionSerial": "CUL 棒（串口）",
+    "connectionNetwork": "CUN/CUNO（网络）",
+    "host": "主机名或 IP 地址",
+    "hostHelp": "CUN/CUNO 的主机名或 IP 地址",
+    "hostIsRequired": "必须填写主机名或 IP 地址",
+    "port": "端口",
+    "portHelp": "culfw 监听的 TCP 端口（默认 2323）"
 }
-

@@ -4,7 +4,7 @@ import moment from 'moment';
 import { sprintf } from 'sprintf-js';
 import { Parser as BinaryParser } from 'binary-parser';
 
-import { CommunicationServiceLayer } from './communication-layer';
+import { CommunicationServiceLayer, type CulConnectionOptions } from './communication-layer';
 import { CulPacket } from './culpacket';
 import type {
     PairDeviceData,
@@ -103,14 +103,13 @@ export class MaxDriver extends EventEmitter<MaxDriverEvents> {
         logger: ioBroker.Logger,
         baseAddress: string,
         pairModeEnabled: boolean,
-        serialPortName: string,
-        baudrate: number,
+        connection: CulConnectionOptions,
     ) {
         super();
         this.logger = logger;
         this.baseAddress = baseAddress;
         this.pairModeEnabled = pairModeEnabled;
-        this.comLayer = new CommunicationServiceLayer(logger, baudrate, serialPortName, this.baseAddress);
+        this.comLayer = new CommunicationServiceLayer(logger, connection, this.baseAddress);
 
         this.comLayer.on('culDataReceived', data => this.handleIncommingMessage(data));
 
@@ -130,7 +129,7 @@ export class MaxDriver extends EventEmitter<MaxDriverEvents> {
         return this.comLayer.connect();
     }
 
-    public disconnect(): Promise<void> | false {
+    public disconnect(): Promise<void> {
         clearInterval(this.checkTimeInterval);
         return this.comLayer.disconnect();
     }

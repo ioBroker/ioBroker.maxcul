@@ -10,6 +10,7 @@
 import { Adapter, type AdapterOptions } from '@iobroker/adapter-core';
 import { SerialPort } from 'serialport';
 
+import type { CulConnectionOptions } from './lib/communication-layer';
 import { MaxDriver } from './lib/maxcul';
 import type { ChannelTimer, MaxCulAdapterConfig, MaxDeviceData, MaxObject, Task } from './types';
 
@@ -1423,20 +1424,40 @@ export class MaxCulAdapter extends Adapter {
         }
     }
 
-    private connect(): void {
-        void this.setState('info.connection', false, true);
+    /** Build the connection options from the configuration. Returns `null` if the configuration is incomplete */
+    private getConnectionOptions(): CulConnectionOptions | null {
+        if (this.config.connectionType === 'network') {
+            if (!this.config.host) {
+                this.log.warn('Please define the host name or IP address of the CUN/CUNO.');
+                return null;
+            }
+            return {
+                type: 'network',
+                host: this.config.host,
+                port: parseInt(String(this.config.port), 10) || 2323,
+            };
+        }
+
         if (!this.config.serialport) {
             this.log.warn('Please define the serial port.');
+            return null;
+        }
+        return {
+            type: 'serial',
+            port: this.config.serialport,
+            baudrate: parseInt(String(this.config.baudrate), 10) || 9600,
+        };
+    }
+
+    private connect(): void {
+        void this.setState('info.connection', false, true);
+
+        const connection = this.getConnectionOptions();
+        if (!connection) {
             return;
         }
 
-        const max = new MaxDriver(
-            this.log,
-            this.config.baseAddress,
-            true,
-            this.config.serialport,
-            parseInt(String(this.config.baudrate), 10) || 9600,
-        );
+        const max = new MaxDriver(this.log, this.config.baseAddress, true, connection);
         this.max = max;
 
         this.creditsTimer = setInterval(
@@ -1577,10 +1598,10 @@ export class MaxCulAdapter extends Adapter {
             }
         });
 
-        if (this.config.serialport !== 'DEBUG') {
-            void max.connect();
-        } else {
+        if (connection.type === 'serial' && connection.port === 'DEBUG') {
             this.emitDebugDevices(max);
+        } else {
+            void max.connect();
         }
     }
 

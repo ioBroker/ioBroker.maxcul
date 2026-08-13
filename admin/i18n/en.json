@@ -7,5 +7,13 @@
     "scanInterval": "Scan interval (minutes)",
     "selectPort": "Select port",
     "noPortsFound": "No ports found",
-    "notAvailable": "Not available"
+    "notAvailable": "Not available",
+    "connectionType": "Connection type",
+    "connectionSerial": "CUL stick (serial port)",
+    "connectionNetwork": "CUN/CUNO (network)",
+    "host": "Host name or IP address",
+    "hostHelp": "Host name or IP address of the CUN/CUNO",
+    "hostIsRequired": "Host name or IP address is required",
+    "port": "Port",
+    "portHelp": "TCP port culfw is listening on (default 2323)"
 }

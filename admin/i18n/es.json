@@ -7,6 +7,13 @@
     "scanInterval": "Intervalo de escaneo (minutos)",
     "selectPort": "Seleccionar puerto",
     "noPortsFound": "No se encontraron puertos",
-    "notAvailable": "No disponible"
+    "notAvailable": "No disponible",
+    "connectionType": "Tipo de conexión",
+    "connectionSerial": "Memoria CUL (puerto serie)",
+    "connectionNetwork": "CUN/CUNO (red)",
+    "host": "Nombre de host o dirección IP",
+    "hostHelp": "Nombre de host o dirección IP del CUN/CUNO",
+    "hostIsRequired": "El nombre de host o la dirección IP es obligatorio",
+    "port": "Puerto",
+    "portHelp": "Puerto TCP en el que escucha culfw (2323 por defecto)"
 }
-
