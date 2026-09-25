@@ -19,7 +19,7 @@
     "@iobroker/adapter-core": "^3.4.3",
     "binary-parser": "^2.3.0",
     "bitset": "^5.2.3",
-    "moment": "^2.30.1",
+    "moment": "^2.31.0",
     "serialport": "^13.0.0",
     "sprintf-js": "^1.1.3"
   },
